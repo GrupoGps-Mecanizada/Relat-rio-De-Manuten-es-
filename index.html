@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GrupoGPS - Sistema De Registro De Manutenção</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            padding: 10px;
+        }
+
+        .container {
+            max-width: 420px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-align: center;
+            padding: 20px 15px;
+        }
+
+        .header h1 {
+            font-size: 1.8em;
+            font-weight: bold;
+            margin-bottom: 5px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header h2 {
+            font-size: 1.1em;
+            font-weight: 300;
+            opacity: 0.9;
+        }
+
+        .navigation {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .nav-btn {
+            flex: 1;
+            padding: 15px 5px;
+            background: transparent;
+            border: none;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .nav-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .nav-btn:not(.active):hover {
+            background: #e9ecef;
+        }
+
+        .content {
+            padding: 20px;
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .camera-section {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .camera-controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin: 15px 0;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            color: white;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            color: white;
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            color: #333;
+        }
+
+        .btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        #videoElement {
+            width: 100%;
+            max-width: 300px;
+            height: 200px;
+            border-radius: 10px;
+            object-fit: cover;
+            margin: 10px 0;
+        }
+
+        #canvas {
+            display: none;
+        }
+
+        .photos-preview {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .photo-item {
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+            aspect-ratio: 1;
+        }
+
+        .photo-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .photo-item .remove-btn {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            background: rgba(255, 0, 0, 0.8);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .status {
+            text-align: center;
+            padding: 10px;
+            margin: 15px 0;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .record-item {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        .record-item.pending {
+            border-left: 4px solid #ffc107;
+            background: #fff3cd;
+        }
+
+        .record-item.completed {
+            border-left: 4px solid #28a745;
+            background: #d4edda;
+        }
+
+        .record-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .record-id {
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .record-status {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-completed {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .record-details {
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .record-actions {
+            margin-top: 10px;
+            display: flex;
+            gap: 5px;
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 12px;
+            border-radius: 15px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+
+        .no-records {
+            text-align: center;
+            padding: 40px 20px;
+            color: #666;
+        }
+
+        /* Mobile optimizations */
+        @media (max-width: 480px) {
+            .container {
+                margin: 0;
+                border-radius: 0;
+                min-height: 100vh;
+            }
+
+            .camera-controls {
+                flex-direction: column;
+            }
+
+            .btn {
+                min-width: auto;
+            }
+
+            .record-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>GrupoGPS</h1>
+            <h2>Sistema De Registro De Manutenção</h2>
+        </div>
+
+        <!-- Navigation -->
+        <div class="navigation">
+            <button class="nav-btn active" onclick="showSection('novo')">📝 Novo</button>
+            <button class="nav-btn" onclick="showSection('registros')">📋 Registros</button>
+            <button class="nav-btn" onclick="showSection('relatorios')">📊 Relatórios</button>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+            <!-- Novo Registro Section -->
+            <div id="novo" class="section active">
+                <form id="maintenanceForm">
+                    <div class="form-group">
+                        <label for="placa">🚗 Placa *</label>
+                        <input type="text" id="placa" name="placa" placeholder="Ex: ABC-1234" required 
+                               style="text-transform: uppercase;">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="tipoEquipamento">🚛 Tipo De Equipamento *</label>
+                        <select id="tipoEquipamento" name="tipoEquipamento" required>
+                            <option value="">Selecione o tipo</option>
+                            <option value="Caminhão">Caminhão</option>
+                            <option value="Empilhadeira">Empilhadeira</option>
+                            <option value="Guindaste">Guindaste</option>
+                            <option value="Trator">Trator</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="dataRegistro">📅 Data De Registro *</label>
+                        <input type="date" id="dataRegistro" name="dataRegistro" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="problema">⚠️ Problema *</label>
+                        <textarea id="problema" name="problema" rows="3" 
+                                placeholder="Descreva o problema identificado..." required></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="horaProblema">🕐 Hora Do Problema *</label>
+                        <input type="time" id="horaProblema" name="horaProblema" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="horaComunicacao">📞 Hora De Comunicação *</label>
+                        <input type="time" id="horaComunicacao" name="horaComunicacao" required>
+                    </div>
+
+                    <!-- Camera Section -->
+                    <div class="camera-section">
+                        <h4>📸 Fotos do Problema</h4>
+                        
+                        <div class="camera-controls">
+                            <button type="button" class="btn btn-primary" id="startCamera">📱 Abrir Câmera</button>
+                            <button type="button" class="btn btn-success" id="capturePhoto" disabled>📷 Capturar</button>
+                            <button type="button" class="btn btn-danger" id="stopCamera" disabled>⏹️ Fechar</button>
+                        </div>
+
+                        <video id="videoElement" autoplay playsinline></video>
+                        <canvas id="canvas"></canvas>
+                        
+                        <div class="photos-preview" id="photosPreview"></div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 20px;">
+                        💾 Salvar Registro
+                    </button>
+
+                    <div id="formStatus"></div>
+                </form>
+            </div>
+
+            <!-- Registros Section -->
+            <div id="registros" class="section">
+                <div style="margin-bottom: 20px;">
+                    <button class="btn btn-primary" onclick="loadRecords()" style="width: 100%;">
+                        🔄 Atualizar Registros
+                    </button>
+                </div>
+                
+                <div id="recordsList">
+                    <div class="loading">Carregando registros...</div>
+                </div>
+            </div>
+
+            <!-- Relatórios Section -->
+            <div id="relatorios" class="section">
+                <div style="margin-bottom: 20px;">
+                    <h4>📊 Gerar Relatórios</h4>
+                </div>
+
+                <div class="form-group">
+                    <label for="reportType">Tipo de Relatório</label>
+                    <select id="reportType">
+                        <option value="all">Todos os Registros</option>
+                        <option value="pending">Registros em Aberto</option>
+                        <option value="completed">Registros Concluídos</option>
+                        <option value="by-equipment">Por Tipo de Equipamento</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="reportPeriod">Período</label>
+                    <select id="reportPeriod">
+                        <option value="all">Todos os Períodos</option>
+                        <option value="today">Hoje</option>
+                        <option value="week">Esta Semana</option>
+                        <option value="month">Este Mês</option>
+                    </select>
+                </div>
+
+                <button class="btn btn-warning" onclick="generateReport()" style="width: 100%;">
+                    📄 Gerar Relatório PDF
+                </button>
+
+                <div id="reportStatus"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class MaintenanceSystem {
+            constructor() {
+                this.video = document.getElementById('videoElement');
+                this.canvas = document.getElementById('canvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.photos = [];
+                this.stream = null;
+                this.records = [];
+                
+                // Google Sheets Configuration (configure sua planilha)
+                this.GOOGLE_SHEETS_ID = 'YOUR_GOOGLE_SHEETS_ID';
+                this.GOOGLE_API_KEY = 'YOUR_GOOGLE_API_KEY';
+                this.GOOGLE_SHEETS_URL = `https://sheets.googleapis.com/v4/spreadsheets/${this.GOOGLE_SHEETS_ID}/values/Sheet1!A:Z?key=${this.GOOGLE_API_KEY}`;
+                
+                // Google Apps Script URL para salvar dados
+                this.GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec';
+                
+                this.initializeSystem();
+            }
+
+            initializeSystem() {
+                // Set current date/time
+                document.getElementById('dataRegistro').value = new Date().toISOString().split('T')[0];
+                document.getElementById('horaProblema').value = new Date().toTimeString().slice(0,5);
+                document.getElementById('horaComunicacao').value = new Date().toTimeString().slice(0,5);
+                
+                // Event listeners
+                this.setupEventListeners();
+                
+                // Load existing records
+                this.loadRecords();
+            }
+
+            setupEventListeners() {
+                // Camera controls
+                document.getElementById('startCamera').addEventListener('click', () => this.startCamera());
+                document.getElementById('capturePhoto').addEventListener('click', () => this.capturePhoto());
+                document.getElementById('stopCamera').addEventListener('click', () => this.stopCamera());
+                
+                // Form submission
+                document.getElementById('maintenanceForm').addEventListener('submit', (e) => this.submitForm(e));
+                
+                // Auto-uppercase placa
+                document.getElementById('placa').addEventListener('input', (e) => {
+                    e.target.value = e.target.value.toUpperCase();
+                });
+            }
+
+            async startCamera() {
+                try {
+                    this.stream = await navigator.mediaDevices.getUserMedia({ 
+                        video: { 
+                            width: { ideal: 1280 },
+                            height: { ideal: 720 },
+                            facingMode: 'environment'
+                        } 
+                    });
+                    
+                    this.video.srcObject = this.stream;
+                    
+                    this.video.onloadedmetadata = () => {
+                        this.canvas.width = this.video.videoWidth;
+                        this.canvas.height = this.video.videoHeight;
+                    };
+
+                    document.getElementById('startCamera').disabled = true;
+                    document.getElementById('capturePhoto').disabled = false;
+                    document.getElementById('stopCamera').disabled = false;
+                    
+                    this.showStatus('formStatus', 'Câmera iniciada! 📸', 'success');
+                } catch (error) {
+                    console.error('Erro ao acessar câmera:', error);
+                    this.showStatus('formStatus', 'Erro ao acessar câmera. Verifique as permissões.', 'error');
+                }
+            }
+
+            capturePhoto() {
+                if (this.video.videoWidth === 0 || this.video.videoHeight === 0) {
+                    this.showStatus('formStatus', 'Aguarde a câmera carregar completamente.', 'error');
+                    return;
+                }
+
+                this.ctx.drawImage(this.video, 0, 0, this.canvas.width, this.canvas.height);
+                const imageData = this.canvas.toDataURL('image/jpeg', 0.7);
+                
+                const photoId = Date.now();
+                this.photos.push({
+                    id: photoId,
+                    data: imageData,
+                    timestamp: new Date().toLocaleString('pt-BR')
+                });
+                
+                this.updatePhotosPreview();
+                this.showStatus('formStatus', `Foto capturada! Total: ${this.photos.length}`, 'success');
+            }
+
+            stopCamera() {
+                if (this.stream) {
+                    this.stream.getTracks().forEach(track => track.stop());
+                    this.video.srcObject = null;
+                    this.stream = null;
+                }
+
+                document.getElementById('startCamera').disabled = false;
+                document.getElementById('capturePhoto').disabled = true;
+                document.getElementById('stopCamera').disabled = true;
+                
+                this.showStatus('formStatus', 'Câmera desligada.', 'info');
+            }
+
+            updatePhotosPreview() {
+                const preview = document.getElementById('photosPreview');
+                preview.innerHTML = this.photos.map(photo => `
+                    <div class="photo-item">
+                        <img src="${photo.data}" alt="Foto ${photo.timestamp}">
+                        <button class="remove-btn" onclick="maintenanceSystem.removePhoto(${photo.id})">×</button>
+                    </div>
+                `).join('');
+            }
+
+            removePhoto(photoId) {
+                this.photos = this.photos.filter(photo => photo.id !== photoId);
+                this.updatePhotosPreview();
+                this.showStatus('formStatus', 'Foto removida!', 'info');
+            }
+
+            generateRecordId() {
+                const now = new Date();
+                const year = now.getFullYear().toString().slice(-2);
+                const month = (now.getMonth() + 1).toString().padStart(2, '0');
+                const day = now.getDate().toString().padStart(2, '0');
+                const time = now.getTime().toString().slice(-4);
+                return `GPS${year}${month}${day}${time}`;
+            }
+
+            async submitForm(e) {
+                e.preventDefault();
+                
+                const formData = new FormData(e.target);
+                const recordId = this.generateRecordId();
+                
+                const record = {
+                    id: recordId,
+                    placa: formData.get('placa'),
+                    tipoEquipamento: formData.get('tipoEquipamento'),
+                    dataRegistro: formData.get('dataRegistro'),
+                    problema: formData.get('problema'),
+                    horaProblema: formData.get('horaProblema'),
+                    horaComunicacao: formData.get('horaComunicacao'),
+                    dataHoraLiberacao: '',
+                    descricao: '',
+                    status: 'Aberto',
+                    fotos: this.photos.length,
+                    timestamp: new Date().toISOString()
+                };
+
+                try {
+                    // Save to localStorage (simulating Google Sheets)
+                    this.saveToLocalStorage(record);
+                    
+                    // TODO: Integrate with real Google Forms/Sheets
+                    // await this.saveToGoogleForms(record);
+                    
+                    this.showStatus('formStatus', `✅ Registro ${recordId} salvo com sucesso!`, 'success');
+                    
+                    // Reset form
+                    setTimeout(() => {
+                        this.resetForm();
+                    }, 2000);
+                    
+                } catch (error) {
+                    console.error('Erro ao salvar:', error);
+                    this.showStatus('formStatus', 'Erro ao salvar registro. Tente novamente.', 'error');
+                }
+            }
+
+            async saveToGoogleSheets(record) {
+                try {
+                    // Prepare data for Google Sheets
+                    const rowData = {
+                        id: record.id,
+                        placa: record.placa,
+                        tipoEquipamento: record.tipoEquipamento,
+                        dataRegistro: record.dataRegistro,
+                        problema: record.problema,
+                        horaProblema: record.horaProblema,
+                        horaComunicacao: record.horaComunicacao,
+                        dataHoraLiberacao: record.dataHoraLiberacao,
+                        descricao: record.descricao,
+                        status: record.status,
+                        timestamp: record.timestamp,
+                        fotosCount: this.photos.length,
+                        fotos: this.photos.map(p => p.data).join('|||') // Separator for multiple photos
+                    };
+
+                    // Send to Google Apps Script
+                    const response = await fetch(this.GOOGLE_SCRIPT_URL, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(rowData)
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Erro ao enviar para Google Sheets');
+                    }
+
+                    const result = await response.json();
+                    console.log('Dados salvos no Google Sheets:', result);
+                    
+                } catch (error) {
+                    console.error('Erro ao salvar no Google Sheets:', error);
+                    throw error;
+                }
+            }
+
+            async loadFromGoogleSheets() {
+                try {
+                    const response = await fetch(`${this.GOOGLE_SCRIPT_URL}?action=read`);
+                    if (!response.ok) {
+                        throw new Error('Erro ao carregar do Google Sheets');
+                    }
+                    
+                    const data = await response.json();
+                    this.records = data.records || [];
+                    this.displayRecords();
+                    
+                } catch (error) {
+                    console.error('Erro ao carregar do Google Sheets:', error);
+                    // Fallback to localStorage
+                    this.loadRecords();
+                }
+            }
+
+            saveToLocalStorage(record) {
+                const existingRecords = JSON.parse(localStorage.getItem('maintenanceRecords') || '[]');
+                existingRecords.push(record);
+                localStorage.setItem('maintenanceRecords', JSON.stringify(existingRecords));
+                
+                // Save photos separately
+                if (this.photos.length > 0) {
+                    localStorage.setItem(`photos_${record.id}`, JSON.stringify(this.photos));
+                }
+            }
+
+            loadRecords() {
+                // Try Google Sheets first, fallback to localStorage
+                if (this.GOOGLE_SCRIPT_URL && this.GOOGLE_SCRIPT_URL !== 'https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec') {
+                    this.loadFromGoogleSheets();
+                } else {
+                    try {
+                        this.records = JSON.parse(localStorage.getItem('maintenanceRecords') || '[]');
+                        this.displayRecords();
+                    } catch (error) {
+                        console.error('Erro ao carregar registros:', error);
+                        document.getElementById('recordsList').innerHTML = 
+                            '<div class="status error">Erro ao carregar registros.</div>';
+                    }
+                }
+            }
+
+            displayRecords() {
+                const container = document.getElementById('recordsList');
+                
+                if (this.records.length === 0) {
+                    container.innerHTML = `
+                        <div class="no-records">
+                            📝 Nenhum registro encontrado.<br>
+                            Crie seu primeiro registro na aba "Novo".
+                        </div>
+                    `;
+                    return;
+                }
+
+                // Sort by most recent first
+                const sortedRecords = this.records.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+                
+                container.innerHTML = sortedRecords.map(record => `
+                    <div class="record-item ${record.status.toLowerCase() === 'aberto' ? 'pending' : 'completed'}">
+                        <div class="record-header">
+                            <span class="record-id">#${record.id}</span>
+                            <span class="record-status ${record.status.toLowerCase() === 'aberto' ? 'status-pending' : 'status-completed'}">
+                                ${record.status}
+                            </span>
+                        </div>
+                        <div class="record-details">
+                            <strong>${record.placa}</strong> - ${record.tipoEquipamento}<br>
+                            📅 ${new Date(record.dataRegistro).toLocaleDateString('pt-BR')}<br>
+                            🕐 ${record.horaProblema} - 📞 ${record.horaComunicacao}<br>
+                            ⚠️ ${record.problema}<br>
+                            📸 ${record.fotos} foto(s)
+                        </div>
+                        <div class="record-actions">
+                            <button class="btn btn-small btn-warning" onclick="maintenanceSystem.generateSingleReport('${record.id}')">
+                                📄 PDF
+                            </button>
+                            ${record.status === 'Aberto' ? `
+                                <button class="btn btn-small btn-success" onclick="maintenanceSystem.completeRecord('${record.id}')">
+                                    ✅ Finalizar
+                                </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            completeRecord(recordId) {
+                const descricao = prompt('Descreva a solução aplicada:');
+                if (descricao !== null) {
+                    const recordIndex = this.records.findIndex(r => r.id === recordId);
+                    if (recordIndex !== -1) {
+                        this.records[recordIndex].status = 'Concluído';
+                        this.records[recordIndex].dataHoraLiberacao = new Date().toLocaleString('pt-BR');
+                        this.records[recordIndex].descricao = descricao;
+                        
+                        localStorage.setItem('maintenanceRecords', JSON.stringify(this.records));
+                        this.displayRecords();
+                        
+                        this.showStatus('formStatus', `✅ Registro ${recordId} finalizado!`, 'success');
+                    }
+                }
+            }
+
+            async generateReport() {
+                const type = document.getElementById('reportType').value;
+                const period = document.getElementById('reportPeriod').value;
+                
+                let filteredRecords = [...this.records];
+                
+                // Filter by type
+                if (type === 'pending') {
+                    filteredRecords = filteredRecords.filter(r => r.status === 'Aberto');
+                } else if (type === 'completed') {
+                    filteredRecords = filteredRecords.filter(r => r.status === 'Concluído');
+                }
+                
+                // Filter by period
+                const now = new Date();
+                if (period === 'today') {
+                    const today = now.toISOString().split('T')[0];
+                    filteredRecords = filteredRecords.filter(r => r.dataRegistro === today);
+                } else if (period === 'week') {
+                    const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+                    filteredRecords = filteredRecords.filter(r => new Date(r.dataRegistro) >= weekAgo);
+                } else if (period === 'month') {
+                    const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+                    filteredRecords = filteredRecords.filter(r => new Date(r.dataRegistro) >= monthAgo);
+                }
+                
+                if (filteredRecords.length === 0) {
+                    this.showStatus('reportStatus', 'Nenhum registro encontrado para os filtros selecionados.', 'error');
+                    return;
+                }
+                
+                await this.generatePDFReport(filteredRecords, type);
+            }
+
+            async generateSingleReport(recordId) {
+                const record = this.records.find(r => r.id === recordId);
+                if (record) {
+                    await this.generatePDFReport([record], 'single');
+                }
+            }
+
+            async generatePDFReport(records, type) {
+                try {
+                    const { jsPDF } = window.jspdf;
+                    const pdf = new jsPDF();
+                    
+                    const pageWidth = pdf.internal.pageSize.getWidth();
+                    const pageHeight = pdf.internal.pageSize.getHeight();
+                    let currentY = 20;
+
+                    // Header
+                    pdf.setFontSize(18);
+                    pdf.setFont(undefined, 'bold');
+                    pdf.text('GRUPOGPS', pageWidth / 2, currentY, { align: 'center' });
+                    currentY += 8;
+                    
+                    pdf.setFontSize(14);
+                    pdf.text('Sistema De Registro De Manutenção', pageWidth / 2, currentY, { align: 'center' });
+                    currentY += 15;
+                    
+                    pdf.setFontSize(10);
+                    pdf.setFont(undefined, 'normal');
+                    pdf.text(`Relatório gerado em: ${new Date().toLocaleString('pt-BR')}`, pageWidth / 2, currentY, { align: 'center' });
+                    currentY += 20;
+
+                    // Records
+                    for (const record of records) {
+                        if (currentY > pageHeight - 60) {
+                            pdf.addPage();
+                            currentY = 20;
+                        }
+                        
+                        // Record header
+                        pdf.setFontSize(12);
+                        pdf.setFont(undefined, 'bold');
+                        pdf.text(`Registro: ${record.id} - ${record.status}`, 20, currentY);
+                        currentY += 8;
+                        
+                        // Record details
+                        pdf.setFontSize(10);
+                        pdf.setFont(undefined, 'normal');
+                        const details = [
+                            `Placa: ${record.placa}`,
+                            `Equipamento: ${record.tipoEquipamento}`,
+                            `Data: ${new Date(record.dataRegistro).toLocaleDateString('pt-BR')}`,
+                            `Hora do Problema: ${record.horaProblema}`,
+                            `Hora da Comunicação: ${record.horaComunicacao}`,
+                            `Problema: ${record.problema}`
+                        ];
+                        
+                        if (record.dataHoraLiberacao) {
+                            details.push(`Liberação: ${record.dataHoraLiberacao}`);
+                        }
+                        
+                        if (record.descricao) {
+                            details.push(`Solução: ${record.descricao}`);
+                        }
+                        
+                        details.forEach(detail => {
+                            const splitText = pdf.splitTextToSize(detail, pageWidth - 40);
+                            pdf.text(splitText, 20, currentY);
+                            currentY += splitText.length * 4 + 2;
+                        });
+                        
+                        currentY += 10;
+                    }
+                    
+                    // Summary
+                    if (records.length > 1) {
+                        if (currentY > pageHeight - 40) {
+                            pdf.addPage();
+                            currentY = 20;
+                        }
+                        
+                        pdf.setFontSize(12);
+                        pdf.setFont(undefined, 'bold');
+                        pdf.text('RESUMO', 20, currentY);
+                        currentY += 10;
+                        
+                        pdf.setFontSize(10);
+                        pdf.setFont(undefined, 'normal');
+                        const openRecords = records.filter(r => r.status === 'Aberto').length;
+                        const closedRecords = records.filter(r => r.status === 'Concluído').length;
+                        
+                        pdf.text(`Total de registros: ${records.length}`, 20, currentY);
+                        currentY += 5;
+                        pdf.text(`Registros em aberto: ${openRecords}`, 20, currentY);
+                        currentY += 5;
+                        pdf.text(`Registros concluídos: ${closedRecords}`, 20, currentY);
+                    }
+                    
+                    // Save PDF
+                    const fileName = `GrupoGPS_Relatorio_${new Date().toISOString().split('T')[0]}.pdf`;
+                    pdf.save(fileName);
+                    
+                    this.showStatus('reportStatus', `✅ Relatório gerado: ${fileName}`, 'success');
+                    
+                } catch (error) {
+                    console.error('Erro ao gerar relatório:', error);
+                    this.showStatus('reportStatus', 'Erro ao gerar relatório.', 'error');
+                }
+            }
+
+            resetForm() {
+                document.getElementById('maintenanceForm').reset();
+                this.photos = [];
+                this.updatePhotosPreview();
+                this.stopCamera();
+                
+                // Reset default values
+                document.getElementById('dataRegistro').value = new Date().toISOString().split('T')[0];
+                document.getElementById('horaProblema').value = new Date().toTimeString().slice(0,5);
+                document.getElementById('horaComunicacao').value = new Date().toTimeString().slice(0,5);
+            }
+
+            showStatus(elementId, message, type) {
+                const element = document.getElementById(elementId);
+                element.className = `status ${type}`;
+                element.textContent = message;
+                
+                setTimeout(() => {
+                    element.textContent = '';
+                    element.className = '';
+                }, 5000);
+            }
+        }
+
+        // Navigation functions
+        function showSection(sectionName) {
+            // Update nav buttons
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Update sections
+            document.querySelectorAll('.section').forEach(section => section.classList.remove('active'));
+            document.getElementById(sectionName).classList.add('active');
+            
+            // Load records when accessing records section
+            if (sectionName === 'registros') {
+                maintenanceSystem.loadRecords();
+            }
+        }
+
+        // Initialize system
+        let maintenanceSystem;
+        document.addEventListener('DOMContentLoaded', () => {
+            maintenanceSystem = new MaintenanceSystem();
+        });
+    </script>
+</body>
+</html>
