@@ -521,38 +521,44 @@
         }
 
         .record-card {
-            background: #f8f9fa;
+            background: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%);
             border: 1px solid #e9ecef;
-            border-radius: 12px;
+            border-radius: 15px;
             padding: 20px;
             margin-bottom: 20px;
             position: relative;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.07), 0 1px 3px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+
+        .record-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1), 0 3px 6px rgba(0,0,0,0.05);
         }
 
         .record-card.pending {
-            border-left: 5px solid #ffc107;
-            background: linear-gradient(to right, #fff3cd, #f8f9fa);
+            border-left: 6px solid #ffc107;
+            background: linear-gradient(145deg, #fff3cd 0%, #ffeeba 50%, #f8f9fa 100%);
         }
 
         .record-card.completed {
-            border-left: 5px solid #28a745;
-            background: linear-gradient(to right, #d4edda, #f8f9fa);
+            border-left: 6px solid #28a745;
+            background: linear-gradient(145deg, #d4edda 0%, #c3e6cb 50%, #f8f9fa 100%);
         }
 
         .record-card.approved {
-            border-left: 5px solid #007bff;
-            background: linear-gradient(to right, #d1ecf1, #f8f9fa);
+            border-left: 6px solid #007bff;
+            background: linear-gradient(145deg, #d1ecf1 0%, #bee5eb 50%, #f8f9fa 100%);
         }
 
         .record-card.rejected {
-            border-left: 5px solid #dc3545;
-            background: linear-gradient(to right, #f8d7da, #f8f9fa);
+            border-left: 6px solid #dc3545;
+            background: linear-gradient(145deg, #f8d7da 0%, #f5c6cb 50%, #f8f9fa 100%);
         }
 
         .record-title {
-            font-size: 16px;
-            font-weight: bold;
+            font-size: 18px;
+            font-weight: 700;
             color: #495057;
             margin-bottom: 15px;
             display: flex;
@@ -563,27 +569,29 @@
         }
 
         .record-content {
-            font-family: 'Courier New', monospace;
+            font-family: 'Courier New', 'Consolas', 'Monaco', monospace;
             font-size: 13px;
             line-height: 1.6;
-            background: white;
-            padding: 15px;
-            border-radius: 8px;
+            background: #ffffff;
+            padding: 18px;
+            border-radius: 10px;
             border: 1px solid #dee2e6;
             white-space: pre-line;
-            margin-bottom: 15px;
+            margin-bottom: 18px;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
         }
 
         .record-actions-enhanced {
             display: flex;
-            gap: 8px;
+            gap: 10px;
             flex-wrap: wrap;
             justify-content: space-between;
+            align-items: center;
         }
 
         .action-group {
             display: flex;
-            gap: 5px;
+            gap: 8px;
             flex: 1;
         }
 
@@ -623,7 +631,11 @@
                 min-width: auto;
             }
 
-            .record-actions {
+            .record-actions-enhanced {
+                flex-direction: column;
+            }
+
+            .action-group {
                 flex-direction: column;
             }
 
@@ -634,6 +646,38 @@
             .modal-content {
                 margin: 0;
                 border-radius: 10px;
+            }
+
+            .config-section {
+                padding: 10px;
+            }
+
+            .record-card {
+                padding: 15px;
+                margin-bottom: 15px;
+            }
+
+            .record-title {
+                font-size: 14px;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 5px;
+            }
+
+            .record-content {
+                font-size: 12px;
+                padding: 10px;
+            }
+
+            .navigation {
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+
+            .nav-btn {
+                min-width: 80px;
+                font-size: 12px;
+                padding: 12px 8px;
             }
         }
     </style>
@@ -665,7 +709,7 @@
                     <div class="status-info">
                         <p><strong>Status:</strong> <span id="connectionStatus">Verificando...</span></p>
                         <p><strong>URL Google Apps Script:</strong></p>
-                        <p style="font-size: 11px; word-break: break-all; color: #666;" id="currentUrl">Carregando...</p>
+                        <p style="font-size: 11px; word-break: break-all; color: #666; background: #f8f9fa; padding: 8px; border-radius: 4px; margin-top: 5px; font-family: monospace;" id="currentUrl">Carregando...</p>
                     </div>
                     
                     <button class="btn btn-info" onclick="maintenanceSystem.testConnection()" style="width: 100%; margin: 10px 0;">
@@ -942,7 +986,7 @@
                 this.filteredRecords = [];
                 
                 // URL do Google Apps Script - CONFIGURE AQUI
-                this.googleScriptUrl = 'https://script.google.com/macros/s/AKfycbz3pU2JKQz-n_OCmEVPSDZb0LXIYWAluqCJq-gs1UuWbbCIebCM9yetWoAXTPFrjHRwog/exec';
+                this.googleScriptUrl = 'https://script.google.com/macros/s/AKfycbzIku4cu-E6zndHC8bmyS0XrfEv3jFFf73oual3CRVdmxzdF9u_o4VclgVpeMUAzs0FTQ/exec';
                 
                 // Initialize system
                 this.initializeSystem();
@@ -972,17 +1016,18 @@
                 // Load existing records
                 this.loadRecords();
                 
-                // Initialize system stats if config elements exist
-                setTimeout(() => {
-                    if (document.getElementById('localRecordsCount')) {
-                        this.updateSystemStats();
-                    }
-                }, 500);
-                
                 console.log('MaintenanceSystem inicializado com sucesso');
             }
 
             async testConnection() {
+                const button = document.querySelector('button[onclick="maintenanceSystem.testConnection()"]');
+                const originalText = button ? button.textContent : '';
+                
+                if (button) {
+                    button.textContent = 'Testando...';
+                    button.disabled = true;
+                }
+                
                 if (this.googleScriptUrl) {
                     try {
                         console.log('Testando conexão com Google Apps Script...');
@@ -996,16 +1041,53 @@
                         // Com no-cors, sempre assumimos sucesso se não há erro de rede
                         console.log('Conexão com Google Apps Script estabelecida!');
                         this.updateConnectionStatus(true);
+                        this.showStatus('configStatus', 'Conexão testada com sucesso!', 'success');
+                        
+                        if (button) {
+                            button.textContent = '✓ Conectado';
+                            button.style.background = '#28a745';
+                            setTimeout(() => {
+                                button.textContent = originalText;
+                                button.style.background = '';
+                                button.disabled = false;
+                            }, 2000);
+                        }
+                        
                         return true;
                         
                     } catch (error) {
                         console.warn('Falha na conexão com Google Apps Script:', error.message);
                         console.log('Funcionando em modo offline');
                         this.updateConnectionStatus(false);
+                        this.showStatus('configStatus', 'Falha na conexão. Sistema funcionando offline.', 'error');
+                        
+                        if (button) {
+                            button.textContent = '✗ Falha';
+                            button.style.background = '#dc3545';
+                            setTimeout(() => {
+                                button.textContent = originalText;
+                                button.style.background = '';
+                                button.disabled = false;
+                            }, 2000);
+                        }
+                        
                         return false;
                     }
                 }
+                
                 this.updateConnectionStatus(false);
+                this.showStatus('configStatus', 'URL do Google Apps Script não configurada.', 'error');
+                
+                if (button) {
+                    button.textContent = '✗ Não configurado';
+                    button.style.background = '#ffc107';
+                    setTimeout(() => {
+                        button.textContent = originalText;
+                        button.style.background = '';
+                        button.disabled = false;
+                    }, 2000);
+                }
+                
                 return false;
             }
 
@@ -1035,7 +1117,9 @@
                 }
                 
                 if (currentUrlElement) {
-                    currentUrlElement.textContent = this.googleScriptUrl || 'Não configurado';
+                    currentUrlElement.textContent = this.googleScriptUrl ? 
+                        this.googleScriptUrl.substring(0, 60) + '...' : 
+                        'Não configurado';
                 }
             }
 
@@ -1854,8 +1938,13 @@
             
             // Update system stats when accessing configurations
             if (sectionName === 'configuracoes') {
-                maintenanceSystem.updateSystemStats();
                 maintenanceSystem.updateConnectionStatus(!!maintenanceSystem.googleScriptUrl);
+                // Aguardar um pouco para os elementos carregarem
+                setTimeout(() => {
+                    if (document.getElementById('localRecordsCount')) {
+                        maintenanceSystem.updateSystemStats();
+                    }
+                }, 100);
             }
         }
 
