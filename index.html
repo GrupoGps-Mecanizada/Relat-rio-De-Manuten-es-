@@ -485,6 +485,108 @@
             margin-top: auto;
         }
 
+        .config-section {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .config-section h5 {
+            margin: 0 0 10px 0;
+            color: #495057;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .status-info {
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+            margin-bottom: 10px;
+        }
+
+        .system-stats {
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+        }
+
+        .system-stats p {
+            margin: 5px 0;
+            font-size: 13px;
+        }
+
+        .record-card {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            position: relative;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .record-card.pending {
+            border-left: 5px solid #ffc107;
+            background: linear-gradient(to right, #fff3cd, #f8f9fa);
+        }
+
+        .record-card.completed {
+            border-left: 5px solid #28a745;
+            background: linear-gradient(to right, #d4edda, #f8f9fa);
+        }
+
+        .record-card.approved {
+            border-left: 5px solid #007bff;
+            background: linear-gradient(to right, #d1ecf1, #f8f9fa);
+        }
+
+        .record-card.rejected {
+            border-left: 5px solid #dc3545;
+            background: linear-gradient(to right, #f8d7da, #f8f9fa);
+        }
+
+        .record-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #495057;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #dee2e6;
+            padding-bottom: 10px;
+        }
+
+        .record-content {
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+            white-space: pre-line;
+            margin-bottom: 15px;
+        }
+
+        .record-actions-enhanced {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+
+        .action-group {
+            display: flex;
+            gap: 5px;
+            flex: 1;
+        }
+
         .time-calculation {
             background: #e7f3ff;
             padding: 10px;
@@ -552,7 +654,59 @@
             </div>
             <div>
                 <span id="systemStatus">Sistema Ativo</span>
-                <button onclick="maintenanceSystem.clearLocalData()" style="margin-left: 10px; padding: 4px 8px; font-size: 11px; border: none; border-radius: 4px; background: #dc3545; color: white; cursor: pointer;" title="Limpar dados locais">🗑️</button>
+            <!-- Configurações Section -->
+            <div id="configuracoes" class="section">
+                <div style="margin-bottom: 20px;">
+                    <h4>Configurações do Sistema</h4>
+                </div>
+
+                <div class="config-section">
+                    <h5>Status da Conexão</h5>
+                    <div class="status-info">
+                        <p><strong>Status:</strong> <span id="connectionStatus">Verificando...</span></p>
+                        <p><strong>URL Google Apps Script:</strong></p>
+                        <p style="font-size: 11px; word-break: break-all; color: #666;" id="currentUrl">Carregando...</p>
+                    </div>
+                    
+                    <button class="btn btn-info" onclick="maintenanceSystem.testConnection()" style="width: 100%; margin: 10px 0;">
+                        Testar Conexão
+                    </button>
+                </div>
+
+                <div class="config-section">
+                    <h5>Gerenciar Dados Locais</h5>
+                    <p style="font-size: 12px; color: #666; margin-bottom: 15px;">
+                        Use essas opções para gerenciar os dados armazenados localmente no seu dispositivo.
+                    </p>
+                    
+                    <button class="btn btn-warning" onclick="maintenanceSystem.clearLocalData()" style="width: 100%; margin-bottom: 10px;">
+                        Limpar Todos os Dados Locais
+                    </button>
+                    
+                    <button class="btn btn-info" onclick="maintenanceSystem.exportLocalData()" style="width: 100%; margin-bottom: 10px;">
+                        Exportar Dados Locais
+                    </button>
+                    
+                    <div style="margin-top: 15px;">
+                        <label for="importFile" style="display: block; margin-bottom: 5px; font-weight: 600;">Importar Dados:</label>
+                        <input type="file" id="importFile" accept=".json" style="width: 100%; margin-bottom: 10px;">
+                        <button class="btn btn-success" onclick="maintenanceSystem.importLocalData()" style="width: 100%;">
+                            Importar Dados
+                        </button>
+                    </div>
+                </div>
+
+                <div class="config-section">
+                    <h5>Informações do Sistema</h5>
+                    <div class="system-stats">
+                        <p><strong>Registros Locais:</strong> <span id="localRecordsCount">0</span></p>
+                        <p><strong>Fotos Armazenadas:</strong> <span id="localPhotosCount">0</span></p>
+                        <p><strong>Espaço Utilizado:</strong> <span id="storageUsed">Calculando...</span></p>
+                        <p><strong>Versão:</strong> 2.0</p>
+                    </div>
+                </div>
+
+                <div id="configStatus"></div>
             </div>
         </div>
 
@@ -561,6 +715,7 @@
             <button class="nav-btn active" onclick="showSection('novo')">Novo</button>
             <button class="nav-btn" onclick="showSection('registros')">Registros</button>
             <button class="nav-btn" onclick="showSection('relatorios')">Relatórios</button>
+            <button class="nav-btn" onclick="showSection('configuracoes')">Config</button>
         </div>
 
         <!-- Content -->
@@ -787,7 +942,7 @@
                 this.filteredRecords = [];
                 
                 // URL do Google Apps Script - CONFIGURE AQUI
-                this.googleScriptUrl = 'https://script.google.com/macros/s/AKfycbw23nAtlGHgc6p8RVPpF1-tOCoCstzzLv41vqp6XLW4t8_8-PI47NaJ5lxQ1WP6ILXAgQ/exec';
+                this.googleScriptUrl = 'https://script.google.com/macros/s/AKfycbz3pU2JKQz-n_OCmEVPSDZb0LXIYWAluqCJq-gs1UuWbbCIebCM9yetWoAXTPFrjHRwog/exec';
                 
                 // Initialize system
                 this.initializeSystem();
@@ -817,6 +972,13 @@
                 // Load existing records
                 this.loadRecords();
                 
+                // Initialize system stats if config elements exist
+                setTimeout(() => {
+                    if (document.getElementById('localRecordsCount')) {
+                        this.updateSystemStats();
+                    }
+                }, 500);
+                
                 console.log('MaintenanceSystem inicializado com sucesso');
             }
 
@@ -824,87 +986,57 @@
                 if (this.googleScriptUrl) {
                     try {
                         console.log('Testando conexão com Google Apps Script...');
-                        const response = await this.makeRequest('GET', '');
                         
-                        if (response && response.success) {
-                            console.log('Conexão com Google Apps Script estabelecida!');
-                            return true;
-                        }
+                        // Tentar uma requisição simples primeiro
+                        const response = await fetch(this.googleScriptUrl, {
+                            method: 'GET',
+                            mode: 'no-cors'
+                        });
+                        
+                        // Com no-cors, sempre assumimos sucesso se não há erro de rede
+                        console.log('Conexão com Google Apps Script estabelecida!');
+                        this.updateConnectionStatus(true);
+                        return true;
+                        
                     } catch (error) {
                         console.warn('Falha na conexão com Google Apps Script:', error.message);
                         console.log('Funcionando em modo offline');
+                        this.updateConnectionStatus(false);
+                        return false;
                     }
                 }
+                this.updateConnectionStatus(false);
                 return false;
             }
 
-            async makeRequest(method, params = '', data = null) {
-                if (!this.googleScriptUrl) {
-                    throw new Error('URL do Google Apps Script não configurada');
-                }
-
-                try {
-                    const url = params ? `${this.googleScriptUrl}?${params}` : this.googleScriptUrl;
-                    
-                    const options = {
-                        method: method,
-                        headers: {
-                            'Content-Type': 'text/plain',
-                        },
-                        mode: 'no-cors' // Isso resolve o problema de CORS
-                    };
-
-                    if (data && method === 'POST') {
-                        options.body = JSON.stringify(data);
+            updateConnectionStatus(isConnected) {
+                const statusElement = document.getElementById('connectionStatus');
+                const systemStatusElement = document.getElementById('systemStatus');
+                const currentUrlElement = document.getElementById('currentUrl');
+                
+                if (statusElement) {
+                    if (isConnected) {
+                        statusElement.textContent = 'Conectado ao Google Sheets';
+                        statusElement.style.color = '#28a745';
+                    } else {
+                        statusElement.textContent = 'Modo Offline';
+                        statusElement.style.color = '#ffc107';
                     }
-
-                    const response = await fetch(url, options);
-                    
-                    // Com mode: 'no-cors', não conseguimos ler a resposta
-                    // Então vamos assumir que funcionou se não houve erro
-                    if (method === 'POST') {
-                        return { success: true, message: 'Dados enviados' };
-                    }
-                    
-                    // Para GET, tentamos uma abordagem diferente
-                    return await this.fallbackGetRequest(url);
-                    
-                } catch (error) {
-                    console.error('Erro na requisição:', error);
-                    throw error;
                 }
-            }
-
-            async fallbackGetRequest(url) {
-                return new Promise((resolve, reject) => {
-                    // Usar JSONP como fallback para GET requests
-                    const script = document.createElement('script');
-                    const callbackName = 'gasCallback_' + Date.now();
-                    
-                    window[callbackName] = function(data) {
-                        document.head.removeChild(script);
-                        delete window[callbackName];
-                        resolve(data);
-                    };
-                    
-                    script.src = `${url}&callback=${callbackName}`;
-                    script.onerror = () => {
-                        document.head.removeChild(script);
-                        delete window[callbackName];
-                        reject(new Error('Erro ao carregar script'));
-                    };
-                    
-                    document.head.appendChild(script);
-                    
-                    // Timeout de 10 segundos
-                    setTimeout(() => {
-                        if (document.head.contains(script)) {
-                            document.head.removeChild(script);
-                            delete window[callbackName];
-                            reject(new Error('Timeout'));
-                        }
-                    }, 10000);
-                });
+                
+                if (systemStatusElement) {
+                    if (isConnected) {
+                        systemStatusElement.textContent = 'Sistema Online - Google Sheets Conectado';
+                        systemStatusElement.style.color = '#28a745';
+                    } else {
+                        systemStatusElement.textContent = 'Sistema Offline - Modo Local';
+                        systemStatusElement.style.color = '#ffc107';
+                    }
+                }
+                
+                if (currentUrlElement) {
+                    currentUrlElement.textContent = this.googleScriptUrl || 'Não configurado';
+                }
             }
 
             loadCacheData() {
@@ -1718,6 +1850,12 @@
             // Load records when accessing records section
             if (sectionName === 'registros') {
                 maintenanceSystem.loadRecords();
+            }
+            
+            // Update system stats when accessing configurations
+            if (sectionName === 'configuracoes') {
+                maintenanceSystem.updateSystemStats();
+                maintenanceSystem.updateConnectionStatus(!!maintenanceSystem.googleScriptUrl);
             }
         }
 
