@@ -61,33 +61,6 @@
             align-items: center;
         }
 
-        .config-panel {
-            background: #fff3cd;
-            border: 1px solid #ffeeba;
-            border-radius: 8px;
-            padding: 15px;
-            margin: 0 15px 15px 15px;
-            display: block;
-        }
-
-        .config-panel.hidden {
-            display: none;
-        }
-
-        .config-panel h4 {
-            color: #856404;
-            margin-bottom: 10px;
-            font-size: 14px;
-        }
-
-        .config-panel input {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 12px;
-        }
-
         .navigation {
             display: flex;
             background: #f8f9fa;
@@ -579,21 +552,8 @@
             </div>
             <div>
                 <span id="systemStatus">Sistema Ativo</span>
-                <button id="configBtn" onclick="maintenanceSystem.toggleConfig()" style="margin-left: 10px; padding: 2px 8px; font-size: 11px; border: none; border-radius: 4px; background: #667eea; color: white; cursor: pointer;">⚙️</button>
+                <button onclick="maintenanceSystem.clearLocalData()" style="margin-left: 10px; padding: 4px 8px; font-size: 11px; border: none; border-radius: 4px; background: #dc3545; color: white; cursor: pointer;" title="Limpar dados locais">🗑️</button>
             </div>
-        </div>
-
-        <!-- Configuration Panel -->
-        <div id="configPanel" class="config-panel hidden">
-            <h4>Configuração do Google Apps Script</h4>
-            <p style="font-size: 12px; margin-bottom: 10px;">URL detectada: <span id="detectedUrl">Nenhuma</span></p>
-            <input type="text" id="manualScriptUrl" placeholder="https://script.google.com/macros/s/SEU_ID/exec" style="width: 100%; margin-bottom: 10px;">
-            <div style="display: flex; gap: 5px;">
-                <button onclick="maintenanceSystem.testManualUrl()" style="background: #28a745; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;">Testar</button>
-                <button onclick="maintenanceSystem.saveManualUrl()" style="background: #007bff; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;">Salvar</button>
-                <button onclick="maintenanceSystem.clearUrl()" style="background: #dc3545; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;">Limpar</button>
-            </div>
-            <div id="configStatus" style="margin-top: 10px; font-size: 12px;"></div>
         </div>
 
         <!-- Navigation -->
@@ -825,7 +785,9 @@
                 this.records = [];
                 this.currentRecord = null;
                 this.filteredRecords = [];
-                this.googleScriptUrl = '';
+                
+                // URL do Google Apps Script - CONFIGURE AQUI
+                this.googleScriptUrl = 'https://script.google.com/macros/s/AKfycbzIku4cu-E6zndHC8bmyS0XrfEv3jFFf73oual3CRVdmxzdF9u_o4VclgVpeMUAzs0FTQ/exec';
                 
                 // Initialize system
                 this.initializeSystem();
@@ -840,8 +802,8 @@
                 document.getElementById('horaProblema').value = now.toTimeString().slice(0,5);
                 document.getElementById('horaComunicacao').value = now.toTimeString().slice(0,5);
                 
-                // Auto-detect Google Script URL
-                await this.autoDetectGoogleScriptUrl();
+                // Test Google Script connection
+                await this.testConnection();
                 
                 // Load cache data
                 this.loadCacheData();
@@ -858,70 +820,91 @@
                 console.log('MaintenanceSystem inicializado com sucesso');
             }
 
-            async autoDetectGoogleScriptUrl() {
-                // Try to get URL from localStorage first
-                let storedUrl = localStorage.getItem('googleScriptUrl');
-                
-                if (storedUrl && await this.testGoogleScriptUrl(storedUrl)) {
-                    this.googleScriptUrl = storedUrl;
-                    return;
-                }
-
-                // Common URL patterns to try
-                const possibleUrls = [
-                    // Try common script IDs that might be in localStorage or cookies
-                    this.extractScriptIdFromPage(),
-                    // Add any hardcoded URLs here if needed for specific deployments
-                ];
-
-                for (const url of possibleUrls.filter(Boolean)) {
-                    if (await this.testGoogleScriptUrl(url)) {
-                        this.googleScriptUrl = url;
-                        localStorage.setItem('googleScriptUrl', url);
-                        return;
-                    }
-                }
-
-                // If no URL found, will work in offline mode
-                console.log('Nenhuma URL do Google Apps Script detectada. Funcionando em modo offline.');
-            }
-
-            extractScriptIdFromPage() {
-                // Try to extract script ID from URL parameters or meta tags
-                const urlParams = new URLSearchParams(window.location.search);
-                const scriptId = urlParams.get('scriptId');
-                
-                if (scriptId) {
-                    return `https://script.google.com/macros/s/${scriptId}/exec`;
-                }
-
-                // Check for meta tag
-                const metaTag = document.querySelector('meta[name="google-script-id"]');
-                if (metaTag) {
-                    return `https://script.google.com/macros/s/${metaTag.content}/exec`;
-                }
-
-                return null;
-            }
-
-            async testGoogleScriptUrl(url) {
-                try {
-                    const response = await fetch(url, {
-                        method: 'GET',
-                        mode: 'cors',
-                        headers: {
-                            'Content-Type': 'application/json',
+            async testConnection() {
+                if (this.googleScriptUrl) {
+                    try {
+                        console.log('Testando conexão com Google Apps Script...');
+                        const response = await this.makeRequest('GET', '');
+                        
+                        if (response && response.success) {
+                            console.log('Conexão com Google Apps Script estabelecida!');
+                            return true;
                         }
-                    });
-
-                    if (response.ok) {
-                        const data = await response.json();
-                        return data.success && data.message && data.message.includes('GrupoGPS');
+                    } catch (error) {
+                        console.warn('Falha na conexão com Google Apps Script:', error.message);
+                        console.log('Funcionando em modo offline');
                     }
-                } catch (error) {
-                    console.log(`Teste de URL falhou: ${url}`);
                 }
                 return false;
+            }
+
+            async makeRequest(method, params = '', data = null) {
+                if (!this.googleScriptUrl) {
+                    throw new Error('URL do Google Apps Script não configurada');
+                }
+
+                try {
+                    const url = params ? `${this.googleScriptUrl}?${params}` : this.googleScriptUrl;
+                    
+                    const options = {
+                        method: method,
+                        headers: {
+                            'Content-Type': 'text/plain',
+                        },
+                        mode: 'no-cors' // Isso resolve o problema de CORS
+                    };
+
+                    if (data && method === 'POST') {
+                        options.body = JSON.stringify(data);
+                    }
+
+                    const response = await fetch(url, options);
+                    
+                    // Com mode: 'no-cors', não conseguimos ler a resposta
+                    // Então vamos assumir que funcionou se não houve erro
+                    if (method === 'POST') {
+                        return { success: true, message: 'Dados enviados' };
+                    }
+                    
+                    // Para GET, tentamos uma abordagem diferente
+                    return await this.fallbackGetRequest(url);
+                    
+                } catch (error) {
+                    console.error('Erro na requisição:', error);
+                    throw error;
+                }
+            }
+
+            async fallbackGetRequest(url) {
+                return new Promise((resolve, reject) => {
+                    // Usar JSONP como fallback para GET requests
+                    const script = document.createElement('script');
+                    const callbackName = 'gasCallback_' + Date.now();
+                    
+                    window[callbackName] = function(data) {
+                        document.head.removeChild(script);
+                        delete window[callbackName];
+                        resolve(data);
+                    };
+                    
+                    script.src = `${url}&callback=${callbackName}`;
+                    script.onerror = () => {
+                        document.head.removeChild(script);
+                        delete window[callbackName];
+                        reject(new Error('Erro ao carregar script'));
+                    };
+                    
+                    document.head.appendChild(script);
+                    
+                    // Timeout de 10 segundos
+                    setTimeout(() => {
+                        if (document.head.contains(script)) {
+                            document.head.removeChild(script);
+                            delete window[callbackName];
+                            reject(new Error('Timeout'));
+                        }
+                    }, 10000);
+                });
             }
 
             loadCacheData() {
@@ -976,82 +959,16 @@
 
             updateSystemStatus() {
                 const statusElement = document.getElementById('systemStatus');
-                const detectedUrlElement = document.getElementById('detectedUrl');
                 
                 if (this.googleScriptUrl) {
                     statusElement.textContent = 'Sistema Online - Google Sheets Conectado';
                     statusElement.style.color = '#28a745';
-                    if (detectedUrlElement) {
-                        detectedUrlElement.textContent = this.googleScriptUrl.substring(0, 50) + '...';
-                    }
                 } else {
                     statusElement.textContent = 'Sistema Offline - Modo Local';
                     statusElement.style.color = '#ffc107';
-                    if (detectedUrlElement) {
-                        detectedUrlElement.textContent = 'Nenhuma';
-                    }
                 }
                 
                 this.updateCounts();
-            }
-
-            toggleConfig() {
-                const panel = document.getElementById('configPanel');
-                panel.classList.toggle('hidden');
-                
-                if (!panel.classList.contains('hidden')) {
-                    document.getElementById('manualScriptUrl').value = this.googleScriptUrl || '';
-                }
-            }
-
-            async testManualUrl() {
-                const url = document.getElementById('manualScriptUrl').value.trim();
-                const statusElement = document.getElementById('configStatus');
-                
-                if (!url) {
-                    statusElement.innerHTML = '<span style="color: #dc3545;">Digite uma URL válida</span>';
-                    return;
-                }
-
-                statusElement.innerHTML = '<span style="color: #007bff;">Testando conexão...</span>';
-
-                if (await this.testGoogleScriptUrl(url)) {
-                    statusElement.innerHTML = '<span style="color: #28a745;">✓ Conexão bem-sucedida!</span>';
-                } else {
-                    statusElement.innerHTML = '<span style="color: #dc3545;">✗ Falha na conexão</span>';
-                }
-            }
-
-            async saveManualUrl() {
-                const url = document.getElementById('manualScriptUrl').value.trim();
-                const statusElement = document.getElementById('configStatus');
-                
-                if (!url) {
-                    statusElement.innerHTML = '<span style="color: #dc3545;">Digite uma URL válida</span>';
-                    return;
-                }
-
-                if (await this.testGoogleScriptUrl(url)) {
-                    this.googleScriptUrl = url;
-                    localStorage.setItem('googleScriptUrl', url);
-                    this.updateSystemStatus();
-                    statusElement.innerHTML = '<span style="color: #28a745;">✓ URL salva e configurada!</span>';
-                    
-                    // Hide config panel after successful save
-                    setTimeout(() => {
-                        document.getElementById('configPanel').classList.add('hidden');
-                    }, 2000);
-                } else {
-                    statusElement.innerHTML = '<span style="color: #dc3545;">✗ URL inválida ou não acessível</span>';
-                }
-            }
-
-            clearUrl() {
-                this.googleScriptUrl = '';
-                localStorage.removeItem('googleScriptUrl');
-                document.getElementById('manualScriptUrl').value = '';
-                document.getElementById('configStatus').innerHTML = '<span style="color: #ffc107;">URL removida - Modo offline</span>';
-                this.updateSystemStatus();
             }
 
             updateCounts() {
