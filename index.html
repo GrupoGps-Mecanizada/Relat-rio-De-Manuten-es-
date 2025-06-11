@@ -682,33 +682,67 @@
                     });
 
                     if (!response.ok) {
-                        throw new Error('Erro ao enviar para Google Sheets');
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                     }
 
                     const result = await response.json();
-                    console.log('Dados salvos no Google Sheets:', result);
+                    
+                    if (!result.success) {
+                        throw new Error(result.error || 'Erro desconhecido do servidor');
+                    }
+                    
+                    console.log('✅ Dados salvos no Google Sheets:', result);
+                    return result;
                     
                 } catch (error) {
-                    console.error('Erro ao salvar no Google Sheets:', error);
-                    throw error;
+                    console.error('❌ Erro ao salvar no Google Sheets:', error);
+                    
+                    // Re-throw error so the calling function can handle it
+                    throw new Error(`Falha na sincronização: ${error.message}`);
                 }
             }
 
             async loadFromGoogleSheets() {
                 try {
-                    const response = await fetch(`${this.GOOGLE_SCRIPT_URL}?action=read`);
+                    const response = await fetch(`${this.GOOGLE_SCRIPT_URL}?action=read`, {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        }
+                    });
+                    
                     if (!response.ok) {
-                        throw new Error('Erro ao carregar do Google Sheets');
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                     }
                     
                     const data = await response.json();
-                    this.records = data.records || [];
-                    this.displayRecords();
+                    
+                    if (data.success) {
+                        this.records = data.records || [];
+                        this.displayRecords();
+                        console.log('✅ Dados carregados do Google Sheets');
+                    } else {
+                        throw new Error(data.error || 'Erro desconhecido do servidor');
+                    }
                     
                 } catch (error) {
                     console.error('Erro ao carregar do Google Sheets:', error);
-                    // Fallback to localStorage
-                    this.loadRecords();
+                    
+                    // Show error message to user
+                    const recordsList = document.getElementById('recordsList');
+                    if (recordsList) {
+                        recordsList.innerHTML = `
+                            <div class="status error">
+                                ⚠️ Problema de conexão com Google Sheets.<br>
+                                Carregando dados locais...
+                            </div>
+                        `;
+                    }
+                    
+                    // Fallback to localStorage after 2 seconds
+                    setTimeout(() => {
+                        this.loadFromLocalStorage();
+                    }, 2000);
                 }
             }
 
@@ -725,17 +759,22 @@
 
             loadRecords() {
                 // Try Google Sheets first, fallback to localStorage
-                if (this.GOOGLE_SCRIPT_URL && this.GOOGLE_SCRIPT_URL !== 'https://script.google.com/macros/s/AKfycbwGU1HW01Hia7WxaAqzmo2KoZHPwK6sz00ylvGd8MwpniLgkD7vUv9o2hlh-rO7t2stlg/exec') {
+                if (this.GOOGLE_SCRIPT_URL && this.GOOGLE_SCRIPT_URL !== 'https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec') {
                     this.loadFromGoogleSheets();
                 } else {
-                    try {
-                        this.records = JSON.parse(localStorage.getItem('maintenanceRecords') || '[]');
-                        this.displayRecords();
-                    } catch (error) {
-                        console.error('Erro ao carregar registros:', error);
-                        document.getElementById('recordsList').innerHTML = 
-                            '<div class="status error">Erro ao carregar registros.</div>';
-                    }
+                    // Load from localStorage immediately if no Google Script configured
+                    this.loadFromLocalStorage();
+                }
+            }
+
+            loadFromLocalStorage() {
+                try {
+                    this.records = JSON.parse(localStorage.getItem('maintenanceRecords') || '[]');
+                    this.displayRecords();
+                } catch (error) {
+                    console.error('Erro ao carregar registros locais:', error);
+                    document.getElementById('recordsList').innerHTML = 
+                        '<div class="status error">Erro ao carregar registros.</div>';
                 }
             }
 
