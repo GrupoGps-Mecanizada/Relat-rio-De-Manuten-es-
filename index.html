@@ -1168,101 +1168,150 @@
                 this.log('Event listeners configurados.');
             }
 
+            // SUBSTITUA a função testConnection() no seu index.html
+            // Encontre a função testConnection() e substitua por esta versão:
+            
             async testConnection() {
-            const button = document.querySelector(`button[onclick="window.maintenanceSystem && window.maintenanceSystem.testConnection()"]`);
-            const originalText = button ? button.textContent : 'Testar Conexão';
-            
-            if (button) {
-                button.textContent = 'Testando...';
-                button.disabled = true;
-            }
-            
-            if (!this.googleScriptUrl) {
-                this.updateConnectionStatus(false, 'URL do Apps Script não configurada.');
-                this.showStatus(this.domIds.configStatus, 'URL do Google Apps Script não configurada.', 'error');
+                const button = document.querySelector(`button[onclick="window.maintenanceSystem && window.maintenanceSystem.testConnection()"]`);
+                const originalText = button ? button.textContent : 'Testar Conexão';
+                
                 if (button) {
-                    button.textContent = '✗ Não configurado';
-                    button.style.background = '#ffc107';
-                    setTimeout(() => {
-                        if (button) {
-                            button.textContent = originalText;
-                            button.style.background = '';
-                            button.disabled = false;
-                        }
-                    }, 3000);
+                    button.textContent = 'Testando...';
+                    button.disabled = true;
                 }
-                return false;
-            }
-            
-            this.log('Testando conexão com Google Apps Script...');
-            try {
-                // Primeiro teste com GET simples
-                const testUrl = `${this.googleScriptUrl}?action=config&t=${Date.now()}`;
-                const response = await fetch(testUrl, {
-                    method: 'GET',
-                    mode: 'cors',
-                    headers: { 
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json'
-                    },
-                    cache: 'no-cache'
-                });
                 
-                this.log(`Resposta do teste de conexão - Status: ${response.status}`);
-                
-                if (response.ok) {
-                    const data = await response.json();
-                    this.log('Dados de resposta do teste: ' + JSON.stringify(data).substring(0,200), 'info');
-                    
-                    if (data.success && data.config) {
-                        this.connectionTested = true;
-                        this.lastConnectionError = null;
-                        this.updateConnectionStatus(true, 'Conectado e configurado.');
-                        this.showStatus(this.domIds.configStatus, 'Conexão testada com sucesso!', 'success');
-                        if (button) {
-                            button.textContent = '✓ Conectado';
-                            button.style.background = '#28a745';
-                        }
-                        return true;
-                    } else {
-                        throw new Error(data.message || 'Resposta do servidor indica falha na configuração do Apps Script.');
+                if (!this.googleScriptUrl) {
+                    this.updateConnectionStatus(false, 'URL do Apps Script não configurada.');
+                    this.showStatus(this.domIds.configStatus, 'URL do Google Apps Script não configurada.', 'error');
+                    if (button) {
+                        button.textContent = '✗ Não configurado';
+                        button.style.background = '#ffc107';
+                        setTimeout(() => {
+                            if (button) {
+                                button.textContent = originalText;
+                                button.style.background = '';
+                                button.disabled = false;
+                            }
+                        }, 3000);
                     }
-                } else {
-                    // Erro HTTP específico
-                    const errorText = await response.text();
-                    throw new Error(`Erro HTTP ${response.status}: ${response.statusText}. Detalhes: ${errorText.substring(0,100)}`);
+                    return false;
                 }
-            } catch (error) {
-                this.log('Falha na conexão: ' + error.message, 'error', error);
-                this.lastConnectionError = error.message;
-                this.connectionTested = false;
                 
-                // Verificar se é erro de CORS
-                if (error.message.includes('CORS') || error.message.includes('Failed to fetch')) {
-                    this.updateConnectionStatus(false, `ERRO DE CORS: Verifique se o Apps Script foi implantado corretamente.`);
-                    this.showStatus(this.domIds.configStatus, `ERRO DE CORS: O Google Apps Script precisa ser reimplantado. Siga as instruções para corrigir.`, 'error');
-                } else {
+                this.log('Testando conexão com Google Apps Script...');
+                try {
+                    // Método 1: Tentar fetch simples (sem headers customizados)
+                    const testUrl = `${this.googleScriptUrl}?action=config&t=${Date.now()}`;
+                    
+                    const response = await fetch(testUrl, {
+                        method: 'GET',
+                        mode: 'cors'
+                        // Removemos headers customizados para evitar preflight
+                    });
+                    
+                    this.log(`Resposta do teste de conexão - Status: ${response.status}`);
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        this.log('Dados de resposta do teste: ' + JSON.stringify(data).substring(0,200), 'info');
+                        
+                        if (data.success) {
+                            this.connectionTested = true;
+                            this.lastConnectionError = null;
+                            this.updateConnectionStatus(true, 'Conectado e configurado.');
+                            this.showStatus(this.domIds.configStatus, 'Conexão testada com sucesso!', 'success');
+                            if (button) {
+                                button.textContent = '✓ Conectado';
+                                button.style.background = '#28a745';
+                            }
+                            return true;
+                        } else {
+                            throw new Error(data.message || 'Resposta do servidor indica falha.');
+                        }
+                    } else {
+                        throw new Error(`Erro HTTP ${response.status}: ${response.statusText}`);
+                    }
+                } catch (error) {
+                    this.log('Método fetch falhou, tentando JSONP...', 'warn');
+                    
+                    // Método 2: Fallback usando JSONP (contorna CORS completamente)
+                    try {
+                        const jsonpResult = await this.testConnectionJSONP();
+                        if (jsonpResult) {
+                            this.connectionTested = true;
+                            this.lastConnectionError = null;
+                            this.updateConnectionStatus(true, 'Conectado via JSONP.');
+                            this.showStatus(this.domIds.configStatus, 'Conexão testada com sucesso (JSONP)!', 'success');
+                            if (button) {
+                                button.textContent = '✓ Conectado (JSONP)';
+                                button.style.background = '#28a745';
+                            }
+                            return true;
+                        }
+                    } catch (jsonpError) {
+                        this.log('JSONP também falhou: ' + jsonpError.message, 'error', jsonpError);
+                    }
+                    
+                    // Se tudo falhou
+                    this.log('Falha na conexão: ' + error.message, 'error', error);
+                    this.lastConnectionError = error.message;
+                    this.connectionTested = false;
                     this.updateConnectionStatus(false, `Falha: ${error.message.substring(0,100)}...`);
                     this.showStatus(this.domIds.configStatus, `Falha na conexão: ${error.message}`, 'error');
-                }
-                
-                if (button) {
-                    button.textContent = '✗ Falha na Conexão';
-                    button.style.background = '#dc3545';
-                }
-                return false;
-            } finally {
-                if (button) {
-                   setTimeout(() => {
-                        if (button) {
-                            button.textContent = originalText;
-                            button.style.background = '';
-                            button.disabled = false;
-                        }
-                    }, 3000);
+                    if (button) {
+                        button.textContent = '✗ Falha na Conexão';
+                        button.style.background = '#dc3545';
+                    }
+                    return false;
+                } finally {
+                    if (button) {
+                       setTimeout(() => {
+                            if (button) {
+                                button.textContent = originalText;
+                                button.style.background = '';
+                                button.disabled = false;
+                            }
+                        }, 3000);
+                    }
                 }
             }
-        }
+            
+            // ADICIONE esta nova função também (cola depois da função testConnection):
+            testConnectionJSONP() {
+                return new Promise((resolve, reject) => {
+                    const callbackName = 'jsonp_callback_' + Date.now();
+                    const script = document.createElement('script');
+                    const timeoutId = setTimeout(() => {
+                        cleanup();
+                        reject(new Error('JSONP timeout'));
+                    }, 10000);
+                    
+                    const cleanup = () => {
+                        if (script.parentNode) {
+                            script.parentNode.removeChild(script);
+                        }
+                        delete window[callbackName];
+                        clearTimeout(timeoutId);
+                    };
+                    
+                    window[callbackName] = (data) => {
+                        cleanup();
+                        if (data && data.success) {
+                            this.log('JSONP funcionou: ' + JSON.stringify(data).substring(0,100));
+                            resolve(true);
+                        } else {
+                            reject(new Error('JSONP retornou erro: ' + JSON.stringify(data)));
+                        }
+                    };
+                    
+                    script.onerror = () => {
+                        cleanup();
+                        reject(new Error('Erro ao carregar script JSONP'));
+                    };
+                    
+                    script.src = `${this.googleScriptUrl}?action=config&callback=${callbackName}&t=${Date.now()}`;
+                    document.head.appendChild(script);
+                });
+            }
 
             async runDiagnostics() {
                 const resultsDiv = document.getElementById(this.domIds.diagnosticsResults);
