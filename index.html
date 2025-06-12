@@ -1934,41 +1934,40 @@
                 }
             }
 
-            async saveToGoogleSheets(recordData) { // recordData é o objeto do registro
+            // SUBSTITUA a função saveToGoogleSheets() no seu index.html
+            // Encontre a função e substitua por esta versão:
+            
+            async saveToGoogleSheets(recordData) {
                 if (!this.googleScriptUrl) {
                     this.log('URL do Google Apps Script não configurada. Impossível salvar no Sheets.', 'error');
                     throw new Error('URL do Google Apps Script não configurada');
                 }
-
-                // Preparar dados para envio. Inclui as fotos atuais em this.photos e this.photosFinalize.
-                // Se for um novo registro, this.photosFinalize estará vazio.
-                // Se for uma finalização, this.photosFinalize terá dados. this.photos pode ou não ter, dependendo do fluxo.
+            
                 const dataToSend = {
-                    ...recordData, // Contém contagens de fotos e outros metadados
-                    fotos: recordData.status === 'Aberto' ? this.photos.map(photo => photo.data) : [], // Enviar fotos iniciais só se for novo
-                    fotosFinalizacaoData: recordData.status === 'Concluído' ? this.photosFinalize.map(photo => photo.data) : [] // Enviar fotos de finalização só se concluído
+                    ...recordData,
+                    fotos: recordData.status === 'Aberto' ? this.photos.map(photo => photo.data) : [],
+                    fotosFinalizacaoData: recordData.status === 'Concluído' ? this.photosFinalize.map(photo => photo.data) : []
                 };
-                
-                // Se for um registro de teste de diagnóstico, a flag `teste:true` já está em recordData
-                // E `fotos` e `fotosFinalizacaoData` devem estar vazias ou com dados de teste seguros.
-
+            
                 this.log(`Enviando dados para Google Sheets para ID ${recordData.id}. Flag de teste: ${!!recordData.teste}`);
+                
                 try {
+                    // Tentar método fetch simples primeiro
                     const response = await fetch(this.googleScriptUrl, {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(dataToSend),
-                        mode: 'cors'
+                        mode: 'cors',
+                        body: JSON.stringify(dataToSend)
+                        // Removemos headers para evitar preflight
                     });
-
+            
                     this.log(`Resposta do Google Sheets - Status: ${response.status} para ID ${recordData.id}`);
-
+            
                     if (!response.ok) {
                         const errorText = await response.text();
                         this.log(`Erro HTTP ${response.status} do Google Sheets: ${errorText}`, 'error');
-                        throw new Error(`Erro do servidor Google Sheets (HTTP ${response.status}): ${response.statusText}. Detalhes: ${errorText.substring(0,200)}`);
+                        throw new Error(`Erro do servidor Google Sheets (HTTP ${response.status}): ${response.statusText}`);
                     }
-
+            
                     const responseData = await response.json();
                     this.log(`Resposta JSON do Google Sheets para ${recordData.id}: ${JSON.stringify(responseData).substring(0,200)}...`, 'success');
                     
@@ -1977,20 +1976,31 @@
                         throw new Error(responseData.message || 'Erro desconhecido retornado pelo servidor Google Sheets.');
                     }
                     
-                    // Se for um registro de teste de diagnóstico, o backend deve retornar `testMode: true`
                     if (recordData.teste && !responseData.testMode) {
                         this.log(`Registro de teste enviado, mas resposta do servidor não incluiu 'testMode:true'.`, 'warn');
                     }
-
-                    return responseData; // Retornar a resposta completa do Apps Script
-
+            
+                    return responseData;
+            
                 } catch (error) {
-                    this.log(`Erro CRÍTICO ao salvar no Google Sheets para ${recordData.id}: ${error.message}`, 'error', error);
-                    throw error; // Re-lançar para que o chamador (submitForm, runDiagnostics) possa tratar
+                    this.log(`Erro ao salvar no Google Sheets para ${recordData.id}: ${error.message}`, 'error', error);
+                    
+                    // Se for erro de CORS, salvar apenas localmente e notificar
+                    if (error.message.includes('CORS') || error.message.includes('Failed to fetch')) {
+                        this.log(`Erro de CORS detectado. Dados salvos apenas localmente para ${recordData.id}`, 'warn');
+                        // Não re-lançar o erro, permitir que continue com salvamento local
+                        return {
+                            success: true,
+                            localOnly: true,
+                            message: 'Dados salvos localmente (problemas de conectividade com Google Sheets)',
+                            recordId: recordData.id
+                        };
+                    }
+                    
+                    throw error; // Re-lançar outros tipos de erro
                 }
             }
-
-            loadRecords() {
+                        loadRecords() {
                 try {
                     this.records = JSON.parse(localStorage.getItem('maintenanceRecords') || '[]');
                     this.filteredRecords = [...this.records]; // Começa com todos os registros
