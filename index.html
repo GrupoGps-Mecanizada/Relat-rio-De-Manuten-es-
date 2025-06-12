@@ -380,6 +380,7 @@
             gap: 10px;
             align-items: end;
             flex-wrap: wrap;
+            margin-bottom: 15px;
         }
 
         .search-field {
@@ -525,81 +526,6 @@
             font-size: 13px;
         }
 
-        .record-card {
-            background: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%);
-            border: 1px solid #e9ecef;
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 20px;
-            position: relative;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.07), 0 1px 3px rgba(0,0,0,0.05);
-            transition: all 0.3s ease;
-        }
-
-        .record-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 15px rgba(0,0,0,0.1), 0 3px 6px rgba(0,0,0,0.05);
-        }
-
-        .record-card.pending {
-            border-left: 6px solid #ffc107;
-            background: linear-gradient(145deg, #fff3cd 0%, #ffeeba 50%, #f8f9fa 100%);
-        }
-
-        .record-card.completed {
-            border-left: 6px solid #28a745;
-            background: linear-gradient(145deg, #d4edda 0%, #c3e6cb 50%, #f8f9fa 100%);
-        }
-
-        .record-card.approved {
-            border-left: 6px solid #007bff;
-            background: linear-gradient(145deg, #d1ecf1 0%, #bee5eb 50%, #f8f9fa 100%);
-        }
-
-        .record-card.rejected {
-            border-left: 6px solid #dc3545;
-            background: linear-gradient(145deg, #f8d7da 0%, #f5c6cb 50%, #f8f9fa 100%);
-        }
-
-        .record-title {
-            font-size: 18px;
-            font-weight: 700;
-            color: #495057;
-            margin-bottom: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 2px solid #dee2e6;
-            padding-bottom: 10px;
-        }
-
-        .record-content {
-            font-family: 'Courier New', 'Consolas', 'Monaco', monospace;
-            font-size: 13px;
-            line-height: 1.6;
-            background: #ffffff;
-            padding: 18px;
-            border-radius: 10px;
-            border: 1px solid #dee2e6;
-            white-space: pre-line;
-            margin-bottom: 18px;
-            box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
-        }
-
-        .record-actions-enhanced {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .action-group {
-            display: flex;
-            gap: 8px;
-            flex: 1;
-        }
-
         .time-calculation {
             background: #e7f3ff;
             padding: 10px;
@@ -608,18 +534,81 @@
             font-size: 14px;
         }
 
-        /* Tablet optimizations */
-        @media (min-width: 481px) and (max-width: 1024px) {
-            .container {
-                max-width: 600px;
-            }
+        .copy-notification {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #28a745;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            z-index: 3000;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            opacity: 0;
+            transition: all 0.3s ease;
         }
 
-        /* Desktop large screens */
-        @media (min-width: 1025px) {
-            .container {
-                max-width: 500px;
-            }
+        .copy-notification.show {
+            opacity: 1;
+        }
+
+        .advanced-search {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+            border: 1px solid #dee2e6;
+        }
+
+        .advanced-search h5 {
+            margin: 0 0 15px 0;
+            color: #495057;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .debug-panel {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            font-family: monospace;
+            font-size: 12px;
+        }
+
+        .debug-panel h5 {
+            color: #495057;
+            font-family: inherit;
+            margin-bottom: 10px;
+        }
+
+        .debug-info {
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 5px 0;
+            border-left: 3px solid #007bff;
+        }
+
+        .debug-error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 5px 0;
+            border-left: 3px solid #dc3545;
+        }
+
+        .debug-success {
+            background: #d4edda;
+            color: #155724;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 5px 0;
+            border-left: 3px solid #28a745;
         }
 
         /* Mobile optimizations */
@@ -652,14 +641,6 @@
                 min-width: auto;
             }
 
-            .record-actions-enhanced {
-                flex-direction: column;
-            }
-
-            .action-group {
-                flex-direction: column;
-            }
-
             .finalize-modal {
                 padding: 10px;
             }
@@ -670,23 +651,6 @@
             }
 
             .config-section {
-                padding: 10px;
-            }
-
-            .record-card {
-                padding: 15px;
-                margin-bottom: 15px;
-            }
-
-            .record-title {
-                font-size: 14px;
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 5px;
-            }
-
-            .record-content {
-                font-size: 12px;
                 padding: 10px;
             }
 
@@ -818,6 +782,41 @@
                         <button class="btn btn-info" onclick="maintenanceSystem.searchRecords()">Buscar</button>
                         <button class="btn btn-warning" onclick="maintenanceSystem.clearSearch()">Limpar</button>
                     </div>
+                    
+                    <div class="advanced-search">
+                        <h5>Busca Avançada</h5>
+                        <div class="search-row">
+                            <div class="search-field">
+                                <label for="searchPlaca">Placa/Identificação:</label>
+                                <input type="text" id="searchPlaca" placeholder="ABC-1234" style="text-transform: uppercase;">
+                            </div>
+                            <div class="search-field">
+                                <label for="searchEquipamento">Tipo de Equipamento:</label>
+                                <select id="searchEquipamento">
+                                    <option value="">Todos os tipos</option>
+                                    <option value="Alta Pressão">Alta Pressão</option>
+                                    <option value="Auto Vacuo">Auto Vacuo</option>
+                                    <option value="Hiper Vacuo">Hiper Vacuo</option>
+                                    <option value="Aspirador De Po">Aspirador De Pó</option>
+                                    <option value="Brook">Brook</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="search-row">
+                            <div class="search-field">
+                                <label for="searchStatus">Status:</label>
+                                <select id="searchStatus">
+                                    <option value="">Todos os status</option>
+                                    <option value="Aberto">Em Aberto</option>
+                                    <option value="Concluído">Concluído</option>
+                                </select>
+                            </div>
+                            <div class="search-field">
+                                <label for="searchResponsavel">Responsável:</label>
+                                <input type="text" id="searchResponsavel" placeholder="Nome do responsável">
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 
                 <div style="margin-bottom: 20px;">
@@ -885,6 +884,14 @@
                     </button>
                 </div>
 
+                <div class="debug-panel">
+                    <h5>🔧 Diagnóstico do Sistema</h5>
+                    <button class="btn btn-warning" onclick="maintenanceSystem.runDiagnostics()" style="width: 100%; margin-bottom: 10px;">
+                        Executar Diagnóstico Completo
+                    </button>
+                    <div id="diagnosticsResults"></div>
+                </div>
+
                 <div class="config-section">
                     <h5>Gerenciar Dados Locais</h5>
                     <p style="font-size: 12px; color: #666; margin-bottom: 15px;">
@@ -914,7 +921,7 @@
                         <p><strong>Registros Locais:</strong> <span id="localRecordsCount">0</span></p>
                         <p><strong>Fotos Armazenadas:</strong> <span id="localPhotosCount">0</span></p>
                         <p><strong>Espaço Utilizado:</strong> <span id="storageUsed">Calculando...</span></p>
-                        <p><strong>Versão:</strong> 2.0</p>
+                        <p><strong>Versão:</strong> 2.1</p>
                     </div>
                 </div>
 
@@ -926,6 +933,11 @@
         <div class="footer">
             Desenvolvido por Warlison Abreu
         </div>
+    </div>
+
+    <!-- Copy Notification -->
+    <div id="copyNotification" class="copy-notification">
+        ✅ Texto copiado para a área de transferência!
     </div>
 
     <!-- Finalize Modal -->
@@ -1009,23 +1021,25 @@
                 this.filteredRecords = [];
                 
                 // URL do Google Apps Script - CONFIGURE AQUI
-                this.googleScriptUrl = 'https://script.google.com/macros/s/AKfycbz3pU2JKQz-n_OCmEVPSDZb0LXIYWAluqCJq-gs1UuWbbCIebCM9yetWoAXTPFrjHRwog/exec';
+                this.googleScriptUrl = 'https://script.google.com/macros/s/AKfycbzIku4cu-E6zndHC8bmyS0XrfEv3jFFf73oual3CRVdmxzdF9u_o4VclgVpeMUAzs0FTQ/exec';
+                
+                // Debug flags
+                this.debugMode = true;
+                this.connectionTested = false;
+                this.lastConnectionError = null;
                 
                 // Initialize system
                 this.initializeSystem();
             }
 
             async initializeSystem() {
-                console.log('Iniciando MaintenanceSystem...');
+                this.log('Iniciando MaintenanceSystem...');
                 
                 // Set current date/time
                 const now = new Date();
                 document.getElementById('dataRegistro').value = now.toISOString().split('T')[0];
                 document.getElementById('horaProblema').value = now.toTimeString().slice(0,5);
                 document.getElementById('horaComunicacao').value = now.toTimeString().slice(0,5);
-                
-                // Test Google Script connection
-                await this.testConnection();
                 
                 // Load cache data
                 this.loadCacheData();
@@ -1039,7 +1053,20 @@
                 // Load existing records
                 this.loadRecords();
                 
-                console.log('MaintenanceSystem inicializado com sucesso');
+                // Auto-uppercase for search fields
+                this.setupSearchFieldsFormatting();
+                
+                // Test connection in background
+                setTimeout(() => this.testConnection(), 1000);
+                
+                this.log('MaintenanceSystem inicializado com sucesso');
+            }
+
+            log(message, type = 'info') {
+                if (this.debugMode) {
+                    const timestamp = new Date().toLocaleString('pt-BR');
+                    console.log(`[${timestamp}] ${message}`);
+                }
             }
 
             async testConnection() {
@@ -1051,87 +1078,236 @@
                     button.disabled = true;
                 }
                 
-                if (this.googleScriptUrl) {
-                    try {
-                        console.log('Testando conexão com Google Apps Script...');
-                        
-                        // Tentar uma requisição simples primeiro
-                        const response = await fetch(this.googleScriptUrl, {
-                            method: 'GET',
-                            mode: 'no-cors'
-                        });
-                        
-                        // Com no-cors, sempre assumimos sucesso se não há erro de rede
-                        console.log('Conexão com Google Apps Script estabelecida!');
-                        this.updateConnectionStatus(true);
-                        this.showStatus('configStatus', 'Conexão testada com sucesso!', 'success');
-                        
-                        if (button) {
-                            button.textContent = '✓ Conectado';
-                            button.style.background = '#28a745';
-                            setTimeout(() => {
-                                button.textContent = originalText;
-                                button.style.background = '';
-                                button.disabled = false;
-                            }, 2000);
-                        }
-                        
-                        return true;
-                        
-                    } catch (error) {
-                        console.warn('Falha na conexão com Google Apps Script:', error.message);
-                        console.log('Funcionando em modo offline');
-                        this.updateConnectionStatus(false);
-                        this.showStatus('configStatus', 'Falha na conexão. Sistema funcionando offline.', 'error');
-                        
-                        if (button) {
-                            button.textContent = '✗ Falha';
-                            button.style.background = '#dc3545';
-                            setTimeout(() => {
-                                button.textContent = originalText;
-                                button.style.background = '';
-                                button.disabled = false;
-                            }, 2000);
-                        }
-                        
-                        return false;
+                if (!this.googleScriptUrl) {
+                    this.updateConnectionStatus(false, 'URL não configurada');
+                    this.showStatus('configStatus', 'URL do Google Apps Script não configurada.', 'error');
+                    if (button) {
+                        button.textContent = '✗ Não configurado';
+                        button.style.background = '#ffc107';
+                        setTimeout(() => {
+                            button.textContent = originalText;
+                            button.style.background = '';
+                            button.disabled = false;
+                        }, 2000);
                     }
+                    return false;
                 }
                 
-                this.updateConnectionStatus(false);
-                this.showStatus('configStatus', 'URL do Google Apps Script não configurada.', 'error');
+                try {
+                    this.log('Testando conexão com Google Apps Script...', 'info');
+                    
+                    // Fazer uma requisição real para testar a conectividade
+                    const testUrl = `${this.googleScriptUrl}?action=config&t=${Date.now()}`;
+                    const response = await fetch(testUrl, {
+                        method: 'GET',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json',
+                        },
+                        mode: 'cors'
+                    });
+                    
+                    this.log(`Resposta recebida - Status: ${response.status}`, 'info');
+                    
+                    if (response.ok) {
+                        // Tentar ler a resposta como JSON
+                        try {
+                            const data = await response.json();
+                            this.log('Dados de resposta: ' + JSON.stringify(data), 'success');
+                            
+                            if (data.success) {
+                                this.connectionTested = true;
+                                this.lastConnectionError = null;
+                                this.updateConnectionStatus(true, 'Conectado e funcionando');
+                                this.showStatus('configStatus', 'Conexão testada com sucesso!', 'success');
+                                
+                                if (button) {
+                                    button.textContent = '✓ Conectado';
+                                    button.style.background = '#28a745';
+                                    setTimeout(() => {
+                                        button.textContent = originalText;
+                                        button.style.background = '';
+                                        button.disabled = false;
+                                    }, 2000);
+                                }
+                                return true;
+                            } else {
+                                throw new Error(data.message || 'Resposta indica falha');
+                            }
+                        } catch (jsonError) {
+                            this.log('Erro ao processar JSON da resposta: ' + jsonError.message, 'error');
+                            // Pode ser que a resposta não seja JSON, mas a conexão foi bem-sucedida
+                            const responseText = await response.text();
+                            this.log('Texto da resposta: ' + responseText.substring(0, 200), 'info');
+                            
+                            // Se chegou até aqui, pelo menos a URL está acessível
+                            this.connectionTested = true;
+                            this.updateConnectionStatus(true, 'Conectado (resposta não-JSON)');
+                            this.showStatus('configStatus', 'Conexão estabelecida, mas resposta inesperada.', 'info');
+                        }
+                    } else {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+                    
+                } catch (error) {
+                    this.log('Falha na conexão: ' + error.message, 'error');
+                    this.lastConnectionError = error.message;
+                    this.connectionTested = false;
+                    this.updateConnectionStatus(false, error.message);
+                    this.showStatus('configStatus', `Falha na conexão: ${error.message}`, 'error');
+                    
+                    if (button) {
+                        button.textContent = '✗ Falha';
+                        button.style.background = '#dc3545';
+                        setTimeout(() => {
+                            button.textContent = originalText;
+                            button.style.background = '';
+                            button.disabled = false;
+                        }, 2000);
+                    }
+                    return false;
+                }
                 
                 if (button) {
-                    button.textContent = '✗ Não configurado';
-                    button.style.background = '#ffc107';
-                    setTimeout(() => {
-                        button.textContent = originalText;
-                        button.style.background = '';
-                        button.disabled = false;
-                    }, 2000);
+                    button.disabled = false;
                 }
-                
-                return false;
             }
 
-            updateConnectionStatus(isConnected) {
+            async runDiagnostics() {
+                const resultsDiv = document.getElementById('diagnosticsResults');
+                resultsDiv.innerHTML = '<div class="debug-info">🔍 Executando diagnóstico...</div>';
+                
+                const diagnostics = [];
+                
+                // 1. Verificar URL do Google Apps Script
+                diagnostics.push({
+                    test: 'URL Configurada',
+                    result: this.googleScriptUrl ? 'OK' : 'FALHA',
+                    details: this.googleScriptUrl || 'URL não configurada',
+                    type: this.googleScriptUrl ? 'success' : 'error'
+                });
+                
+                // 2. Testar conectividade básica
+                try {
+                    const response = await fetch(this.googleScriptUrl + '?test=ping', {
+                        method: 'GET',
+                        mode: 'no-cors'
+                    });
+                    diagnostics.push({
+                        test: 'Conectividade Básica',
+                        result: 'OK',
+                        details: 'Requisição enviada sem erro de rede',
+                        type: 'success'
+                    });
+                } catch (error) {
+                    diagnostics.push({
+                        test: 'Conectividade Básica',
+                        result: 'FALHA',
+                        details: error.message,
+                        type: 'error'
+                    });
+                }
+                
+                // 3. Verificar dados locais
+                const localRecords = JSON.parse(localStorage.getItem('maintenanceRecords') || '[]');
+                diagnostics.push({
+                    test: 'Dados Locais',
+                    result: localRecords.length > 0 ? 'OK' : 'VAZIO',
+                    details: `${localRecords.length} registros encontrados`,
+                    type: localRecords.length > 0 ? 'success' : 'info'
+                });
+                
+                // 4. Verificar fotos locais
+                const photoKeys = Object.keys(localStorage).filter(key => key.startsWith('photos_'));
+                diagnostics.push({
+                    test: 'Fotos Locais',
+                    result: photoKeys.length > 0 ? 'OK' : 'VAZIO',
+                    details: `${photoKeys.length} conjuntos de fotos encontrados`,
+                    type: photoKeys.length > 0 ? 'success' : 'info'
+                });
+                
+                // 5. Verificar espaço do localStorage
+                try {
+                    let totalSize = 0;
+                    Object.keys(localStorage).forEach(key => {
+                        totalSize += localStorage.getItem(key).length;
+                    });
+                    const sizeInMB = (totalSize / (1024 * 1024)).toFixed(2);
+                    
+                    diagnostics.push({
+                        test: 'Espaço de Armazenamento',
+                        result: totalSize > 0 ? 'OK' : 'VAZIO',
+                        details: `${sizeInMB} MB utilizados`,
+                        type: parseFloat(sizeInMB) > 5 ? 'info' : 'success'
+                    });
+                } catch (error) {
+                    diagnostics.push({
+                        test: 'Espaço de Armazenamento',
+                        result: 'ERRO',
+                        details: error.message,
+                        type: 'error'
+                    });
+                }
+                
+                // 6. Testar envio de dados fictícios
+                try {
+                    const testData = {
+                        id: 'TEST_' + Date.now(),
+                        responsavel: 'Teste Diagnóstico',
+                        test: true
+                    };
+                    
+                    await this.saveToGoogleSheets(testData);
+                    diagnostics.push({
+                        test: 'Envio de Dados',
+                        result: 'OK',
+                        details: 'Dados de teste enviados com sucesso',
+                        type: 'success'
+                    });
+                } catch (error) {
+                    diagnostics.push({
+                        test: 'Envio de Dados',
+                        result: 'FALHA',
+                        details: error.message,
+                        type: 'error'
+                    });
+                }
+                
+                // Exibir resultados
+                let html = '';
+                diagnostics.forEach(diag => {
+                    const className = diag.type === 'success' ? 'debug-success' : 
+                                    diag.type === 'error' ? 'debug-error' : 'debug-info';
+                    html += `
+                        <div class="${className}">
+                            <strong>${diag.test}:</strong> ${diag.result}<br>
+                            <small>${diag.details}</small>
+                        </div>
+                    `;
+                });
+                
+                resultsDiv.innerHTML = html;
+                this.log('Diagnóstico concluído', 'success');
+            }
+
+            updateConnectionStatus(isConnected, details = '') {
                 const statusElement = document.getElementById('connectionStatus');
                 const systemStatusElement = document.getElementById('systemStatus');
                 const currentUrlElement = document.getElementById('currentUrl');
                 
                 if (statusElement) {
                     if (isConnected) {
-                        statusElement.textContent = 'Conectado ao Google Sheets';
+                        statusElement.textContent = `Conectado${details ? ` - ${details}` : ''}`;
                         statusElement.style.color = '#28a745';
                     } else {
-                        statusElement.textContent = 'Modo Offline';
-                        statusElement.style.color = '#ffc107';
+                        statusElement.textContent = `Offline${details ? ` - ${details}` : ''}`;
+                        statusElement.style.color = '#dc3545';
                     }
                 }
                 
                 if (systemStatusElement) {
                     if (isConnected) {
-                        systemStatusElement.textContent = 'Sistema Online - Google Sheets Conectado';
+                        systemStatusElement.textContent = 'Sistema Online - Google Conectado';
                         systemStatusElement.style.color = '#28a745';
                     } else {
                         systemStatusElement.textContent = 'Sistema Offline - Modo Local';
@@ -1155,7 +1331,7 @@
                         if (data.responsavel) document.getElementById('responsavel').value = data.responsavel;
                         if (data.tipoEquipamento) document.getElementById('tipoEquipamento').value = data.tipoEquipamento;
                     } catch (error) {
-                        console.error('Erro ao carregar cache:', error);
+                        this.log('Erro ao carregar cache: ' + error.message, 'error');
                     }
                 }
             }
@@ -1196,17 +1372,14 @@
                 document.getElementById('dataHoraLiberacao').addEventListener('change', () => this.calculateMaintenanceTime());
             }
 
+            setupSearchFieldsFormatting() {
+                // Auto-uppercase for search placa
+                document.getElementById('searchPlaca').addEventListener('input', (e) => {
+                    e.target.value = e.target.value.toUpperCase();
+                });
+            }
+
             updateSystemStatus() {
-                const statusElement = document.getElementById('systemStatus');
-                
-                if (this.googleScriptUrl) {
-                    statusElement.textContent = 'Sistema Online - Google Sheets Conectado';
-                    statusElement.style.color = '#28a745';
-                } else {
-                    statusElement.textContent = 'Sistema Offline - Modo Local';
-                    statusElement.style.color = '#ffc107';
-                }
-                
                 this.updateCounts();
             }
 
@@ -1292,7 +1465,7 @@
                     
                     this.showStatus('configStatus', 'Dados exportados com sucesso!', 'success');
                 } catch (error) {
-                    console.error('Erro ao exportar dados:', error);
+                    this.log('Erro ao exportar dados: ' + error.message, 'error');
                     this.showStatus('configStatus', 'Erro ao exportar dados.', 'error');
                 }
             }
@@ -1328,7 +1501,7 @@
                         this.showStatus('configStatus', 'Dados importados com sucesso!', 'success');
                         fileInput.value = '';
                     } catch (error) {
-                        console.error('Erro ao importar dados:', error);
+                        this.log('Erro ao importar dados: ' + error.message, 'error');
                         this.showStatus('configStatus', 'Erro ao importar dados. Verifique o formato do arquivo.', 'error');
                     }
                 };
@@ -1373,7 +1546,7 @@
                     
                     this.showStatus('formStatus', 'Câmera iniciada com sucesso', 'success');
                 } catch (error) {
-                    console.error('Erro ao acessar câmera:', error);
+                    this.log('Erro ao acessar câmera: ' + error.message, 'error');
                     this.showStatus('formStatus', 'Erro ao acessar câmera. Verifique as permissões.', 'error');
                 }
             }
@@ -1510,12 +1683,12 @@
                     this.saveToLocalStorage(record);
                     
                     // Try to save to Google Sheets if URL is available
-                    if (this.googleScriptUrl) {
+                    if (this.googleScriptUrl && this.connectionTested) {
                         try {
                             await this.saveToGoogleSheets(record);
                             this.showStatus('formStatus', `Registro ${recordId} salvo no Google Sheets!`, 'success');
                         } catch (error) {
-                            console.error('Erro ao salvar no Google Sheets:', error);
+                            this.log('Erro ao salvar no Google Sheets: ' + error.message, 'error');
                             this.showStatus('formStatus', `Registro ${recordId} salvo localmente! (Erro na sincronização)`, 'success');
                         }
                     } else {
@@ -1531,7 +1704,7 @@
                     }, 2000);
                     
                 } catch (error) {
-                    console.error('Erro ao salvar registro:', error);
+                    this.log('Erro ao salvar registro: ' + error.message, 'error');
                     this.showStatus('formStatus', 'Erro ao salvar registro.', 'error');
                 }
             }
@@ -1558,13 +1731,52 @@
                     localStorage.setItem(`photos_finalize_${record.id}`, JSON.stringify(this.photosFinalize));
                 }
                 
-                console.log(`Registro ${record.id} salvo no localStorage`);
+                this.log(`Registro ${record.id} salvo no localStorage`, 'success');
             }
 
             async saveToGoogleSheets(record) {
-                // Placeholder for Google Sheets integration
-                // In a real implementation, this would send data to Google Sheets
-                console.log('Salvando no Google Sheets:', record);
+                if (!this.googleScriptUrl) {
+                    throw new Error('URL do Google Apps Script não configurada');
+                }
+
+                // Preparar dados para envio
+                const dataToSend = {
+                    ...record,
+                    fotos: this.photos.map(photo => photo.data), // Enviar dados das fotos
+                    fotosFinalizacaoData: this.photosFinalize.map(photo => photo.data) // Fotos de finalização
+                };
+
+                try {
+                    this.log('Enviando dados para Google Sheets...', 'info');
+                    
+                    const response = await fetch(this.googleScriptUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(dataToSend),
+                        mode: 'cors'
+                    });
+
+                    this.log(`Resposta recebida - Status: ${response.status}`, 'info');
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+
+                    const responseData = await response.json();
+                    this.log('Dados salvos no Google Sheets: ' + JSON.stringify(responseData), 'success');
+                    
+                    if (!responseData.success) {
+                        throw new Error(responseData.message || 'Erro desconhecido do servidor');
+                    }
+
+                    return responseData;
+
+                } catch (error) {
+                    this.log('Erro ao salvar no Google Sheets: ' + error.message, 'error');
+                    throw error;
+                }
             }
 
             loadRecords() {
@@ -1572,9 +1784,9 @@
                     this.records = JSON.parse(localStorage.getItem('maintenanceRecords') || '[]');
                     this.filteredRecords = [...this.records];
                     this.displayRecords();
-                    console.log(`${this.records.length} registros carregados do localStorage`);
+                    this.log(`${this.records.length} registros carregados do localStorage`, 'success');
                 } catch (error) {
-                    console.error('Erro ao carregar registros:', error);
+                    this.log('Erro ao carregar registros: ' + error.message, 'error');
                     document.getElementById('recordsList').innerHTML = 
                         '<div class="status error">Erro ao carregar registros.</div>';
                 }
@@ -1583,11 +1795,15 @@
             searchRecords() {
                 const searchId = document.getElementById('searchId').value.toUpperCase();
                 const searchDate = document.getElementById('searchDate').value;
+                const searchPlaca = document.getElementById('searchPlaca').value.toUpperCase();
+                const searchEquipamento = document.getElementById('searchEquipamento').value;
+                const searchStatus = document.getElementById('searchStatus').value;
+                const searchResponsavel = document.getElementById('searchResponsavel').value.toLowerCase();
 
                 this.filteredRecords = this.records.filter(record => {
                     let matches = true;
                     
-                    if (searchId && !record.id.includes(searchId) && !record.placa.includes(searchId)) {
+                    if (searchId && !record.id.includes(searchId)) {
                         matches = false;
                     }
                     
@@ -1595,15 +1811,36 @@
                         matches = false;
                     }
                     
+                    if (searchPlaca && !record.placa.includes(searchPlaca)) {
+                        matches = false;
+                    }
+                    
+                    if (searchEquipamento && record.tipoEquipamento !== searchEquipamento) {
+                        matches = false;
+                    }
+                    
+                    if (searchStatus && record.status !== searchStatus) {
+                        matches = false;
+                    }
+                    
+                    if (searchResponsavel && !record.responsavel.toLowerCase().includes(searchResponsavel)) {
+                        matches = false;
+                    }
+                    
                     return matches;
                 });
 
                 this.displayRecords();
+                this.log(`Busca realizada: ${this.filteredRecords.length} registros encontrados`, 'info');
             }
 
             clearSearch() {
                 document.getElementById('searchId').value = '';
                 document.getElementById('searchDate').value = '';
+                document.getElementById('searchPlaca').value = '';
+                document.getElementById('searchEquipamento').value = '';
+                document.getElementById('searchStatus').value = '';
+                document.getElementById('searchResponsavel').value = '';
                 this.filteredRecords = [...this.records];
                 this.displayRecords();
             }
@@ -1624,7 +1861,7 @@
                 const sortedRecords = this.filteredRecords.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
                 
                 container.innerHTML = sortedRecords.map(record => {
-                    const recordText = this.generateRecordText(record);
+                    const recordText = this.generateFormattedRecordText(record);
                     const statusClass = this.getStatusClass(record);
                     
                     return `
@@ -1652,39 +1889,51 @@
                 }).join('');
             }
 
-            generateRecordText(record) {
-                let text = `ID: ${record.id}\n`;
-                text += `Responsável: ${record.responsavel || 'Não informado'}\n`;
-                text += `Placa/Identificação: ${record.placa || 'Não informado'}\n`;
-                text += `Tipo de Equipamento: ${record.tipoEquipamento || 'Não informado'}\n`;
-                text += `Data de Registro: ${record.dataRegistro ? new Date(record.dataRegistro).toLocaleDateString('pt-BR') : 'Não informado'}\n`;
-                text += `Problema: ${record.problema || 'Não informado'}\n`;
-                text += `Hora do Problema: ${record.horaProblema || 'Não informado'}\n`;
-                text += `Hora de Comunicação: ${record.horaComunicacao || 'Não informado'}\n`;
-                text += `Status: ${this.getStatusText(record)}\n`;
-                text += `Fotos Iniciais: ${record.fotos || 0}\n`;
+            generateFormattedRecordText(record) {
+                const status = this.getStatusText(record);
+                const dataFormatada = record.dataRegistro ? new Date(record.dataRegistro).toLocaleDateString('pt-BR') : 'Não informado';
+                const agora = new Date().toLocaleString('pt-BR');
                 
-                if (record.dataHoraLiberacao) {
-                    text += `Data/Hora de Liberação: ${new Date(record.dataHoraLiberacao).toLocaleString('pt-BR')}\n`;
-                }
-                
-                if (record.tempoManutencao) {
-                    text += `Tempo de Manutenção: ${record.tempoManutencao}\n`;
-                }
-                
-                if (record.aprovacao) {
-                    text += `Aprovação: ${record.aprovacao}\n`;
-                }
-                
-                if (record.descricao) {
-                    text += `Descrição/Observação: ${record.descricao}\n`;
-                }
-                
-                if (record.fotosFinalizacao) {
-                    text += `Fotos de Finalização: ${record.fotosFinalizacao}\n`;
+                let texto = `══════════════════════════
+REGISTRO DE MANUTENÇÃO - ${status.toUpperCase()}
+══════════════════════════
+📋 IDENTIFICAÇÃO
+ID: ${record.id}
+Responsável: ${record.responsavel || 'Não informado'}
+Placa/Identificação: ${record.placa || 'Não informado'}
+Tipo de Equipamento: ${record.tipoEquipamento || 'Não informado'}
+
+⚠️ PROBLEMA REPORTADO
+Data de Registro: ${dataFormatada}
+Hora do Problema: ${record.horaProblema || 'Não informado'}
+Hora de Comunicação: ${record.horaComunicacao || 'Não informado'}
+Descrição: ${record.problema || 'Não informado'}
+
+📸 DOCUMENTAÇÃO
+Fotos Iniciais: ${record.fotos || 0}`;
+
+                if (record.status === 'Concluído') {
+                    texto += `
+
+✅ FINALIZAÇÃO
+Data/Hora de Liberação: ${record.dataHoraLiberacao ? new Date(record.dataHoraLiberacao).toLocaleString('pt-BR') : 'Não informado'}
+Tempo de Manutenção: ${record.tempoManutencao || 'Não calculado'}
+Status da Manutenção: ${record.aprovacao || 'Não informado'}
+Fotos de Finalização: ${record.fotosFinalizacao || 0}`;
+
+                    if (record.descricao) {
+                        texto += `
+Observações: ${record.descricao}`;
+                    }
                 }
 
-                return text;
+                texto += `
+══════════════════════════
+Status: ${status} | Sistema GrupoGPS
+Gerado em: ${agora}
+══════════════════════════`;
+
+                return texto;
             }
 
             getStatusClass(record) {
@@ -1698,15 +1947,16 @@
                 if (record.aprovacao === 'Aprovada') return 'Aprovada';
                 if (record.aprovacao === 'Reprovada') return 'Reprovada';
                 if (record.status === 'Concluído') return 'Concluído';
-                return 'Aberto';
+                return 'Em Aberto';
             }
 
             copyRecordText(recordId) {
                 const record = this.records.find(r => r.id === recordId);
                 if (record) {
-                    const text = this.generateRecordText(record);
+                    const text = this.generateFormattedRecordText(record);
                     navigator.clipboard.writeText(text).then(() => {
-                        this.showStatus('formStatus', 'Texto copiado para a área de transferência!', 'success');
+                        this.showCopyNotification();
+                        this.log('Texto copiado para área de transferência', 'success');
                     }).catch(() => {
                         // Fallback for older browsers
                         const textArea = document.createElement('textarea');
@@ -1715,9 +1965,18 @@
                         textArea.select();
                         document.execCommand('copy');
                         document.body.removeChild(textArea);
-                        this.showStatus('formStatus', 'Texto copiado!', 'success');
+                        this.showCopyNotification();
+                        this.log('Texto copiado (fallback)', 'success');
                     });
                 }
+            }
+
+            showCopyNotification() {
+                const notification = document.getElementById('copyNotification');
+                notification.classList.add('show');
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 2000);
             }
 
             openFinalizeModal(recordId) {
@@ -1735,7 +1994,7 @@
                 // Populate modal with record data
                 const content = document.getElementById('finalizeContent');
                 content.innerHTML = `
-                    <div class="record-details">${this.generateRecordText(this.currentRecord)}</div>
+                    <div class="record-details">${this.generateFormattedRecordText(this.currentRecord)}</div>
                     <div class="photos-preview" id="originalPhotos"></div>
                 `;
 
@@ -1823,7 +2082,7 @@
                         const diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
                         tempoManutencao = `${diffHours}h ${diffMinutes}min`;
                     } catch (error) {
-                        console.error('Erro ao calcular tempo:', error);
+                        this.log('Erro ao calcular tempo: ' + error.message, 'error');
                     }
                 }
 
@@ -1837,6 +2096,13 @@
 
                 // Save to localStorage
                 this.saveToLocalStorage(this.currentRecord);
+                
+                // Try to save to Google Sheets
+                if (this.googleScriptUrl && this.connectionTested) {
+                    this.saveToGoogleSheets(this.currentRecord).catch(error => {
+                        this.log('Erro ao sincronizar finalização: ' + error.message, 'error');
+                    });
+                }
                 
                 this.showStatus('formStatus', `Registro ${this.currentRecord.id} finalizado com sucesso!`, 'success');
                 this.closeFinalizeModal();
@@ -1920,7 +2186,7 @@
                         }
                         
                         // Record content
-                        const recordText = this.generateRecordText(record);
+                        const recordText = this.generateFormattedRecordText(record);
                         const lines = recordText.split('\n');
                         
                         pdf.setFontSize(12);
@@ -1952,7 +2218,7 @@
                     this.showStatus('reportStatus', `Relatório gerado: ${fileName}`, 'success');
                     
                 } catch (error) {
-                    console.error('Erro ao gerar relatório:', error);
+                    this.log('Erro ao gerar relatório: ' + error.message, 'error');
                     this.showStatus('reportStatus', 'Erro ao gerar relatório.', 'error');
                 }
             }
@@ -1988,12 +2254,12 @@
                                     
                                     currentY += imgHeight + 15;
                                 } catch (imgError) {
-                                    console.error('Erro ao adicionar foto:', imgError);
+                                    this.log('Erro ao adicionar foto: ' + imgError.message, 'error');
                                 }
                             }
                         }
                     } catch (error) {
-                        console.error('Erro ao processar fotos originais:', error);
+                        this.log('Erro ao processar fotos originais: ' + error.message, 'error');
                     }
                 }
                 
@@ -2025,12 +2291,12 @@
                                     
                                     currentY += imgHeight + 15;
                                 } catch (imgError) {
-                                    console.error('Erro ao adicionar foto de finalização:', imgError);
+                                    this.log('Erro ao adicionar foto de finalização: ' + imgError.message, 'error');
                                 }
                             }
                         }
                     } catch (error) {
-                        console.error('Erro ao processar fotos de finalização:', error);
+                        this.log('Erro ao processar fotos de finalização: ' + error.message, 'error');
                     }
                 }
                 
@@ -2085,7 +2351,7 @@
             // Update system stats when accessing configurations
             if (sectionName === 'configuracoes') {
                 maintenanceSystem.updateConnectionStatus(!!maintenanceSystem.googleScriptUrl);
-                // Aguardar um pouco para os elementos carregarem
+                // Wait a bit for elements to load
                 setTimeout(() => {
                     if (document.getElementById('localRecordsCount')) {
                         maintenanceSystem.updateSystemStats();
@@ -2105,6 +2371,53 @@
             
             console.log('GrupoGPS carregado com sucesso!');
         });
-    </script>
-</body>
-</html>
+
+        // Debug function for console testing
+        window.testGrupoGPS = function() {
+            console.log('=== TESTE DO SISTEMA GRUPOGPS ===');
+            console.log('1. URL configurada:', maintenanceSystem.googleScriptUrl);
+            console.log('2. Conexão testada:', maintenanceSystem.connectionTested);
+            console.log('3. Último erro:', maintenanceSystem.lastConnectionError);
+            console.log('4. Registros locais:', maintenanceSystem.records.length);
+            console.log('5. Fotos locais:', Object.keys(localStorage).filter(k => k.startsWith('photos_')).length);
+            
+            // Test data sending
+            const testRecord = {
+                id: 'TEST_' + Date.now(),
+                responsavel: 'Teste Console',
+                placa: 'TEST-123',
+                tipoEquipamento: 'Alta Pressão',
+                dataRegistro: new Date().toISOString().split('T')[0],
+                problema: 'Teste de conexão via console',
+                horaProblema: '12:00',
+                horaComunicacao: '12:30',
+                status: 'Aberto',
+                fotos: 0,
+                timestamp: new Date().toISOString()
+            };
+            
+            console.log('6. Enviando dados de teste...');
+            maintenanceSystem.saveToGoogleSheets(testRecord)
+                .then(result => {
+                    console.log('✅ Teste bem-sucedido:', result);
+                })
+                .catch(error => {
+                    console.log('❌ Teste falhou:', error.message);
+                });
+            
+            return 'Teste iniciado. Verifique os logs acima.';
+        };
+
+        // Error handler for debugging
+        window.onerror = function(msg, url, lineNo, columnNo, error) {
+            if (maintenanceSystem && maintenanceSystem.debugMode) {
+                console.error('Erro global capturado:', {
+                    message: msg,
+                    source: url,
+                    line: lineNo,
+                    column: columnNo,
+                    error: error
+                });
+            }
+            return false;
+        };
