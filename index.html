@@ -17,11 +17,15 @@
             background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
             min-height: 100vh;
             padding: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            margin: 0;
         }
 
         .container {
             max-width: 450px;
-            margin: 0 auto;
+            width: 100%;
             background: white;
             border-radius: 15px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.3);
@@ -29,6 +33,7 @@
             min-height: calc(100vh - 20px);
             display: flex;
             flex-direction: column;
+            margin: 0 auto;
         }
 
         .header {
@@ -603,16 +608,32 @@
             font-size: 14px;
         }
 
+        /* Tablet optimizations */
+        @media (min-width: 481px) and (max-width: 1024px) {
+            .container {
+                max-width: 600px;
+            }
+        }
+
+        /* Desktop large screens */
+        @media (min-width: 1025px) {
+            .container {
+                max-width: 500px;
+            }
+        }
+
         /* Mobile optimizations */
         @media (max-width: 480px) {
             body {
                 padding: 0;
+                align-items: flex-start;
             }
             
             .container {
                 margin: 0;
                 border-radius: 0;
                 min-height: 100vh;
+                max-width: 100%;
             }
 
             .camera-controls {
@@ -698,59 +719,6 @@
             </div>
             <div>
                 <span id="systemStatus">Sistema Ativo</span>
-            <!-- Configurações Section -->
-            <div id="configuracoes" class="section">
-                <div style="margin-bottom: 20px;">
-                    <h4>Configurações do Sistema</h4>
-                </div>
-
-                <div class="config-section">
-                    <h5>Status da Conexão</h5>
-                    <div class="status-info">
-                        <p><strong>Status:</strong> <span id="connectionStatus">Verificando...</span></p>
-                        <p><strong>URL Google Apps Script:</strong></p>
-                        <p style="font-size: 11px; word-break: break-all; color: #666; background: #f8f9fa; padding: 8px; border-radius: 4px; margin-top: 5px; font-family: monospace;" id="currentUrl">Carregando...</p>
-                    </div>
-                    
-                    <button class="btn btn-info" onclick="maintenanceSystem.testConnection()" style="width: 100%; margin: 10px 0;">
-                        Testar Conexão
-                    </button>
-                </div>
-
-                <div class="config-section">
-                    <h5>Gerenciar Dados Locais</h5>
-                    <p style="font-size: 12px; color: #666; margin-bottom: 15px;">
-                        Use essas opções para gerenciar os dados armazenados localmente no seu dispositivo.
-                    </p>
-                    
-                    <button class="btn btn-warning" onclick="maintenanceSystem.clearLocalData()" style="width: 100%; margin-bottom: 10px;">
-                        Limpar Todos os Dados Locais
-                    </button>
-                    
-                    <button class="btn btn-info" onclick="maintenanceSystem.exportLocalData()" style="width: 100%; margin-bottom: 10px;">
-                        Exportar Dados Locais
-                    </button>
-                    
-                    <div style="margin-top: 15px;">
-                        <label for="importFile" style="display: block; margin-bottom: 5px; font-weight: 600;">Importar Dados:</label>
-                        <input type="file" id="importFile" accept=".json" style="width: 100%; margin-bottom: 10px;">
-                        <button class="btn btn-success" onclick="maintenanceSystem.importLocalData()" style="width: 100%;">
-                            Importar Dados
-                        </button>
-                    </div>
-                </div>
-
-                <div class="config-section">
-                    <h5>Informações do Sistema</h5>
-                    <div class="system-stats">
-                        <p><strong>Registros Locais:</strong> <span id="localRecordsCount">0</span></p>
-                        <p><strong>Fotos Armazenadas:</strong> <span id="localPhotosCount">0</span></p>
-                        <p><strong>Espaço Utilizado:</strong> <span id="storageUsed">Calculando...</span></p>
-                        <p><strong>Versão:</strong> 2.0</p>
-                    </div>
-                </div>
-
-                <div id="configStatus"></div>
             </div>
         </div>
 
@@ -896,6 +864,61 @@
                 </button>
 
                 <div id="reportStatus"></div>
+            </div>
+
+            <!-- Configurações Section -->
+            <div id="configuracoes" class="section">
+                <div style="margin-bottom: 20px;">
+                    <h4>Configurações do Sistema</h4>
+                </div>
+
+                <div class="config-section">
+                    <h5>Status da Conexão</h5>
+                    <div class="status-info">
+                        <p><strong>Status:</strong> <span id="connectionStatus">Verificando...</span></p>
+                        <p><strong>URL Google Apps Script:</strong></p>
+                        <p style="font-size: 11px; word-break: break-all; color: #666; background: #f8f9fa; padding: 8px; border-radius: 4px; margin-top: 5px; font-family: monospace;" id="currentUrl">Carregando...</p>
+                    </div>
+                    
+                    <button class="btn btn-info" onclick="maintenanceSystem.testConnection()" style="width: 100%; margin: 10px 0;">
+                        Testar Conexão
+                    </button>
+                </div>
+
+                <div class="config-section">
+                    <h5>Gerenciar Dados Locais</h5>
+                    <p style="font-size: 12px; color: #666; margin-bottom: 15px;">
+                        Use essas opções para gerenciar os dados armazenados localmente no seu dispositivo.
+                    </p>
+                    
+                    <button class="btn btn-warning" onclick="maintenanceSystem.clearLocalData()" style="width: 100%; margin-bottom: 10px;">
+                        Limpar Todos os Dados Locais
+                    </button>
+                    
+                    <button class="btn btn-info" onclick="maintenanceSystem.exportLocalData()" style="width: 100%; margin-bottom: 10px;">
+                        Exportar Dados Locais
+                    </button>
+                    
+                    <div style="margin-top: 15px;">
+                        <label for="importFile" style="display: block; margin-bottom: 5px; font-weight: 600;">Importar Dados:</label>
+                        <input type="file" id="importFile" accept=".json" style="width: 100%; margin-bottom: 10px;">
+                        <button class="btn btn-success" onclick="maintenanceSystem.importLocalData()" style="width: 100%;">
+                            Importar Dados
+                        </button>
+                    </div>
+                </div>
+
+                <div class="config-section">
+                    <h5>Informações do Sistema</h5>
+                    <div class="system-stats">
+                        <p><strong>Registros Locais:</strong> <span id="localRecordsCount">0</span></p>
+                        <p><strong>Fotos Armazenadas:</strong> <span id="localPhotosCount">0</span></p>
+                        <p><strong>Espaço Utilizado:</strong> <span id="storageUsed">Calculando...</span></p>
+                        <p><strong>Versão:</strong> 2.0</p>
+                    </div>
+                </div>
+
+                <div id="configStatus"></div>
             </div>
         </div>
 
@@ -1195,6 +1218,123 @@
                 document.getElementById('photoCount').textContent = photoKeys.length;
             }
 
+            updateSystemStats() {
+                const records = JSON.parse(localStorage.getItem('maintenanceRecords') || '[]');
+                const photoKeys = Object.keys(localStorage).filter(key => key.startsWith('photos_'));
+                
+                // Update counts
+                const localRecordsElement = document.getElementById('localRecordsCount');
+                const localPhotosElement = document.getElementById('localPhotosCount');
+                const storageUsedElement = document.getElementById('storageUsed');
+                
+                if (localRecordsElement) localRecordsElement.textContent = records.length;
+                if (localPhotosElement) localPhotosElement.textContent = photoKeys.length;
+                
+                // Calculate storage usage
+                if (storageUsedElement) {
+                    try {
+                        let totalSize = 0;
+                        Object.keys(localStorage).forEach(key => {
+                            totalSize += localStorage.getItem(key).length;
+                        });
+                        const sizeInMB = (totalSize / (1024 * 1024)).toFixed(2);
+                        storageUsedElement.textContent = `${sizeInMB} MB`;
+                    } catch (error) {
+                        storageUsedElement.textContent = 'Erro ao calcular';
+                    }
+                }
+            }
+
+            clearLocalData() {
+                if (confirm('Tem certeza que deseja limpar todos os dados locais? Esta ação não pode ser desfeita.')) {
+                    const keys = Object.keys(localStorage);
+                    keys.forEach(key => {
+                        if (key.startsWith('maintenanceRecords') || key.startsWith('photos_') || key.startsWith('formCache')) {
+                            localStorage.removeItem(key);
+                        }
+                    });
+                    
+                    this.records = [];
+                    this.filteredRecords = [];
+                    this.photos = [];
+                    this.photosFinalize = [];
+                    
+                    this.updateCounts();
+                    this.updateSystemStats();
+                    this.loadRecords();
+                    
+                    this.showStatus('configStatus', 'Todos os dados locais foram removidos.', 'success');
+                }
+            }
+
+            exportLocalData() {
+                try {
+                    const data = {
+                        records: JSON.parse(localStorage.getItem('maintenanceRecords') || '[]'),
+                        photos: {},
+                        exportDate: new Date().toISOString()
+                    };
+                    
+                    // Export photos
+                    Object.keys(localStorage).forEach(key => {
+                        if (key.startsWith('photos_')) {
+                            data.photos[key] = JSON.parse(localStorage.getItem(key));
+                        }
+                    });
+                    
+                    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `grupogps_backup_${new Date().toISOString().split('T')[0]}.json`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                    
+                    this.showStatus('configStatus', 'Dados exportados com sucesso!', 'success');
+                } catch (error) {
+                    console.error('Erro ao exportar dados:', error);
+                    this.showStatus('configStatus', 'Erro ao exportar dados.', 'error');
+                }
+            }
+
+            importLocalData() {
+                const fileInput = document.getElementById('importFile');
+                const file = fileInput.files[0];
+                
+                if (!file) {
+                    this.showStatus('configStatus', 'Selecione um arquivo para importar.', 'error');
+                    return;
+                }
+                
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const data = JSON.parse(e.target.result);
+                        
+                        if (data.records && Array.isArray(data.records)) {
+                            localStorage.setItem('maintenanceRecords', JSON.stringify(data.records));
+                        }
+                        
+                        if (data.photos && typeof data.photos === 'object') {
+                            Object.keys(data.photos).forEach(key => {
+                                localStorage.setItem(key, JSON.stringify(data.photos[key]));
+                            });
+                        }
+                        
+                        this.loadRecords();
+                        this.updateCounts();
+                        this.updateSystemStats();
+                        
+                        this.showStatus('configStatus', 'Dados importados com sucesso!', 'success');
+                        fileInput.value = '';
+                    } catch (error) {
+                        console.error('Erro ao importar dados:', error);
+                        this.showStatus('configStatus', 'Erro ao importar dados. Verifique o formato do arquivo.', 'error');
+                    }
+                };
+                reader.readAsText(file);
+            }
+
             async startCamera(isFinalize = false) {
                 const video = isFinalize ? this.videoFinalize : this.video;
                 const canvas = isFinalize ? this.canvasFinalize : this.canvas;
@@ -1419,6 +1559,12 @@
                 }
                 
                 console.log(`Registro ${record.id} salvo no localStorage`);
+            }
+
+            async saveToGoogleSheets(record) {
+                // Placeholder for Google Sheets integration
+                // In a real implementation, this would send data to Google Sheets
+                console.log('Salvando no Google Sheets:', record);
             }
 
             loadRecords() {
