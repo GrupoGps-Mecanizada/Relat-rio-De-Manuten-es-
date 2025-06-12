@@ -1935,7 +1935,7 @@
             }
 
             // SUBSTITUA a função saveToGoogleSheets() no seu index.html
-            // Encontre e substitua pela versão corrigida:
+            // Esta versão FINAL evita completamente o preflight CORS:
             
             async saveToGoogleSheets(recordData) {
                 if (!this.googleScriptUrl) {
@@ -1952,22 +1952,18 @@
                 this.log(`Enviando dados para Google Sheets para ID ${recordData.id}. Flag de teste: ${!!recordData.teste}`);
                 
                 try {
-                    // CORREÇÃO: Adicionar headers Content-Type obrigatório
+                    // MÉTODO 1: Tentar POST simples (sem Content-Type para evitar preflight)
                     const response = await fetch(this.googleScriptUrl, {
                         method: 'POST',
                         mode: 'cors',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
                         body: JSON.stringify(dataToSend)
+                        // SEM HEADERS para evitar preflight CORS
                     });
             
                     this.log(`Resposta do Google Sheets - Status: ${response.status} para ID ${recordData.id}`);
             
                     if (!response.ok) {
-                        const errorText = await response.text();
-                        this.log(`Erro HTTP ${response.status} do Google Sheets: ${errorText}`, 'error');
-                        throw new Error(`Erro do servidor Google Sheets (HTTP ${response.status}): ${response.statusText}`);
+                        throw new Error(`Erro HTTP ${response.status}: ${response.statusText}`);
                     }
             
                     const responseData = await response.json();
@@ -1985,35 +1981,70 @@
                     return responseData;
             
                 } catch (error) {
-                    this.log(`Erro ao salvar no Google Sheets para ${recordData.id}: ${error.message}`, 'error', error);
+                    this.log(`POST falhou, tentando método JSONP... Erro: ${error.message}`, 'warn');
                     
-                    // Se for erro de CORS, salvar apenas localmente e notificar
-                    if (error.message.includes('CORS') || error.message.includes('Failed to fetch')) {
-                        this.log(`Erro de CORS detectado. Dados salvos apenas localmente para ${recordData.id}`, 'warn');
-                        return {
-                            success: true,
-                            localOnly: true,
-                            message: 'Dados salvos localmente (problemas de conectividade com Google Sheets)',
-                            recordId: recordData.id
-                        };
+                    // MÉTODO 2: Fallback usando JSONP para contornar CORS completamente
+                    try {
+                        const jsonpResult = await this.saveToGoogleSheetsJSONP(dataToSend);
+                        this.log(`Dados salvos via JSONP para ${recordData.id}`, 'success');
+                        return jsonpResult;
+                    } catch (jsonpError) {
+                        this.log(`JSONP também falhou para ${recordData.id}: ${jsonpError.message}`, 'error');
                     }
                     
-                    throw error;
+                    // MÉTODO 3: Se tudo falhar, salvar apenas localmente
+                    this.log(`Erro de conectividade. Dados salvos apenas localmente para ${recordData.id}`, 'warn');
+                    return {
+                        success: true,
+                        localOnly: true,
+                        message: 'Dados salvos localmente (sem conectividade com Google Sheets)',
+                        recordId: recordData.id
+                    };
                 }
             }
-                                    loadRecords() {
-                try {
-                    this.records = JSON.parse(localStorage.getItem('maintenanceRecords') || '[]');
-                    this.filteredRecords = [...this.records]; // Começa com todos os registros
-                    this.displayRecords();
-                    this.log(`${this.records.length} registros carregados do localStorage e exibidos.`);
-                } catch (error) {
-                    this.log('Erro ao carregar registros do localStorage: ' + error.message, 'error', error);
-                    const recordsListEl = document.getElementById(this.domIds.recordsList);
-                    if (recordsListEl) {
-                        recordsListEl.innerHTML = '<div class="status error">Erro ao carregar registros locais. Verifique o console.</div>';
-                    }
-                }
+            
+            // ADICIONE esta nova função também (cole logo após saveToGoogleSheets):
+            saveToGoogleSheetsJSONP(dataToSend) {
+                return new Promise((resolve, reject) => {
+                    const callbackName = 'jsonp_save_' + Date.now();
+                    const script = document.createElement('script');
+                    const timeoutId = setTimeout(() => {
+                        cleanup();
+                        reject(new Error('JSONP timeout para salvamento'));
+                    }, 30000); // 30 segundos timeout
+                    
+                    const cleanup = () => {
+                        if (script.parentNode) {
+                            script.parentNode.removeChild(script);
+                        }
+                        delete window[callbackName];
+                        clearTimeout(timeoutId);
+                    };
+                    
+                    window[callbackName] = (data) => {
+                        cleanup();
+                        if (data && data.success) {
+                            this.log('JSONP salvamento funcionou: ' + JSON.stringify(data).substring(0,100));
+                            resolve(data);
+                        } else {
+                            reject(new Error('JSONP retornou erro: ' + JSON.stringify(data)));
+                        }
+                    };
+                    
+                    script.onerror = () => {
+                        cleanup();
+                        reject(new Error('Erro ao carregar script JSONP para salvamento'));
+                    };
+                    
+                    // Codificar dados como parâmetros URL para JSONP
+                    const params = new URLSearchParams();
+                    params.append('callback', callbackName);
+                    params.append('data', JSON.stringify(dataToSend));
+                    params.append('method', 'save');
+                    
+                    script.src = `${this.googleScriptUrl}?${params.toString()}`;
+                    document.head.appendChild(script);
+                });
             }
 
             searchRecords() {
