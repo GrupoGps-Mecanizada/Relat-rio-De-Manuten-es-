@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GrupoGPS - Sistema De Registro De Manutenção</title>
+    <link rel="icon" href="favicon.ico" type="image/x-icon"> 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         * {
@@ -688,10 +689,10 @@
 
         <!-- Navigation -->
         <div class="navigation">
-            <button class="nav-btn active" onclick="showSection('novo')">Novo</button>
-            <button class="nav-btn" onclick="showSection('registros')">Registros</button>
-            <button class="nav-btn" onclick="showSection('relatorios')">Relatórios</button>
-            <button class="nav-btn" onclick="showSection('configuracoes')">Config</button>
+            <button class="nav-btn active" onclick="showSection('novo', this)">Novo</button>
+            <button class="nav-btn" onclick="showSection('registros', this)">Registros</button>
+            <button class="nav-btn" onclick="showSection('relatorios', this)">Relatórios</button>
+            <button class="nav-btn" onclick="showSection('configuracoes', this)">Config</button>
         </div>
 
         <!-- Content -->
@@ -703,13 +704,11 @@
                         <label for="responsavel">Responsável pelo Relatório</label>
                         <input type="text" id="responsavel" name="responsavel" placeholder="Nome do responsável">
                     </div>
-
                     <div class="form-group">
                         <label for="placa">Placa/Identificação do Equipamento</label>
                         <input type="text" id="placa" name="placa" placeholder="Ex: ABC-1234" 
                                style="text-transform: uppercase;">
                     </div>
-
                     <div class="form-group">
                         <label for="tipoEquipamento">Tipo De Equipamento</label>
                         <select id="tipoEquipamento" name="tipoEquipamento">
@@ -721,48 +720,37 @@
                             <option value="Brook">Brook</option>
                         </select>
                     </div>
-
                     <div class="form-group">
                         <label for="dataRegistro">Data De Registro</label>
                         <input type="date" id="dataRegistro" name="dataRegistro">
                     </div>
-
                     <div class="form-group">
                         <label for="problema">Problema</label>
                         <textarea id="problema" name="problema" rows="3" 
                                 placeholder="Descreva o problema identificado..."></textarea>
                     </div>
-
                     <div class="form-group">
                         <label for="horaProblema">Hora Do Problema</label>
                         <input type="time" id="horaProblema" name="horaProblema">
                     </div>
-
                     <div class="form-group">
                         <label for="horaComunicacao">Hora De Comunicação com a Servitec</label>
                         <input type="time" id="horaComunicacao" name="horaComunicacao">
                     </div>
-
-                    <!-- Camera Section -->
                     <div class="camera-section">
                         <h4>Fotos do Problema</h4>
-                        
                         <div class="camera-controls">
                             <button type="button" class="btn btn-primary" id="startCamera">Abrir Câmera</button>
                             <button type="button" class="btn btn-success" id="capturePhoto" disabled>Capturar</button>
                             <button type="button" class="btn btn-danger" id="stopCamera" disabled>Fechar</button>
                         </div>
-
                         <video id="videoElement" autoplay playsinline muted></video>
                         <canvas id="canvas"></canvas>
-                        
                         <div class="photos-preview" id="photosPreview"></div>
                     </div>
-
                     <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 20px;">
                         Salvar Registro
                     </button>
-
                     <div id="formStatus"></div>
                 </form>
             </div>
@@ -779,10 +767,9 @@
                             <label for="searchDate">Data específica:</label>
                             <input type="date" id="searchDate">
                         </div>
-                        <button class="btn btn-info" onclick="maintenanceSystem.searchRecords()">Buscar</button>
-                        <button class="btn btn-warning" onclick="maintenanceSystem.clearSearch()">Limpar</button>
+                        <button class="btn btn-info" onclick="window.maintenanceSystem && window.maintenanceSystem.searchRecords()">Buscar</button>
+                        <button class="btn btn-warning" onclick="window.maintenanceSystem && window.maintenanceSystem.clearSearch()">Limpar</button>
                     </div>
-                    
                     <div class="advanced-search">
                         <h5>Busca Avançada</h5>
                         <div class="search-row">
@@ -818,13 +805,11 @@
                         </div>
                     </div>
                 </div>
-                
                 <div style="margin-bottom: 20px;">
-                    <button class="btn btn-primary" onclick="maintenanceSystem.loadRecords()" style="width: 100%;">
+                    <button class="btn btn-primary" onclick="window.maintenanceSystem && window.maintenanceSystem.loadRecords()" style="width: 100%;">
                         Atualizar Registros
                     </button>
                 </div>
-                
                 <div id="recordsList">
                     <div class="loading">Carregando registros...</div>
                 </div>
@@ -832,10 +817,7 @@
 
             <!-- Relatórios Section -->
             <div id="relatorios" class="section">
-                <div style="margin-bottom: 20px;">
-                    <h4>Gerar Relatórios</h4>
-                </div>
-
+                <div style="margin-bottom: 20px;"><h4>Gerar Relatórios</h4></div>
                 <div class="form-group">
                     <label for="reportType">Tipo de Relatório</label>
                     <select id="reportType">
@@ -847,7 +829,6 @@
                         <option value="by-equipment">Por Tipo de Equipamento</option>
                     </select>
                 </div>
-
                 <div class="form-group">
                     <label for="reportPeriod">Período</label>
                     <select id="reportPeriod">
@@ -857,20 +838,15 @@
                         <option value="month">Este Mês</option>
                     </select>
                 </div>
-
-                <button class="btn btn-warning" onclick="maintenanceSystem.generateReport()" style="width: 100%;">
+                <button class="btn btn-warning" onclick="window.maintenanceSystem && window.maintenanceSystem.generateReport()" style="width: 100%;">
                     Gerar Relatório PDF
                 </button>
-
                 <div id="reportStatus"></div>
             </div>
 
             <!-- Configurações Section -->
             <div id="configuracoes" class="section">
-                <div style="margin-bottom: 20px;">
-                    <h4>Configurações do Sistema</h4>
-                </div>
-
+                <div style="margin-bottom: 20px;"><h4>Configurações do Sistema</h4></div>
                 <div class="config-section">
                     <h5>Status da Conexão</h5>
                     <div class="status-info">
@@ -878,53 +854,45 @@
                         <p><strong>URL Google Apps Script:</strong></p>
                         <p style="font-size: 11px; word-break: break-all; color: #666; background: #f8f9fa; padding: 8px; border-radius: 4px; margin-top: 5px; font-family: monospace;" id="currentUrl">Carregando...</p>
                     </div>
-                    
-                    <button class="btn btn-info" onclick="maintenanceSystem.testConnection()" style="width: 100%; margin: 10px 0;">
+                    <button class="btn btn-info" onclick="window.maintenanceSystem && window.maintenanceSystem.testConnection()" style="width: 100%; margin: 10px 0;">
                         Testar Conexão
                     </button>
                 </div>
-
                 <div class="debug-panel">
                     <h5>🔧 Diagnóstico do Sistema</h5>
-                    <button class="btn btn-warning" onclick="maintenanceSystem.runDiagnostics()" style="width: 100%; margin-bottom: 10px;">
+                    <button class="btn btn-warning" onclick="window.maintenanceSystem && window.maintenanceSystem.runDiagnostics()" style="width: 100%; margin-bottom: 10px;">
                         Executar Diagnóstico Completo
                     </button>
                     <div id="diagnosticsResults"></div>
                 </div>
-
                 <div class="config-section">
                     <h5>Gerenciar Dados Locais</h5>
                     <p style="font-size: 12px; color: #666; margin-bottom: 15px;">
                         Use essas opções para gerenciar os dados armazenados localmente no seu dispositivo.
                     </p>
-                    
-                    <button class="btn btn-warning" onclick="maintenanceSystem.clearLocalData()" style="width: 100%; margin-bottom: 10px;">
+                    <button class="btn btn-warning" onclick="window.maintenanceSystem && window.maintenanceSystem.clearLocalData()" style="width: 100%; margin-bottom: 10px;">
                         Limpar Todos os Dados Locais
                     </button>
-                    
-                    <button class="btn btn-info" onclick="maintenanceSystem.exportLocalData()" style="width: 100%; margin-bottom: 10px;">
+                    <button class="btn btn-info" onclick="window.maintenanceSystem && window.maintenanceSystem.exportLocalData()" style="width: 100%; margin-bottom: 10px;">
                         Exportar Dados Locais
                     </button>
-                    
                     <div style="margin-top: 15px;">
                         <label for="importFile" style="display: block; margin-bottom: 5px; font-weight: 600;">Importar Dados:</label>
                         <input type="file" id="importFile" accept=".json" style="width: 100%; margin-bottom: 10px;">
-                        <button class="btn btn-success" onclick="maintenanceSystem.importLocalData()" style="width: 100%;">
+                        <button class="btn btn-success" onclick="window.maintenanceSystem && window.maintenanceSystem.importLocalData()" style="width: 100%;">
                             Importar Dados
                         </button>
                     </div>
                 </div>
-
                 <div class="config-section">
                     <h5>Informações do Sistema</h5>
                     <div class="system-stats">
                         <p><strong>Registros Locais:</strong> <span id="localRecordsCount">0</span></p>
                         <p><strong>Fotos Armazenadas:</strong> <span id="localPhotosCount">0</span></p>
                         <p><strong>Espaço Utilizado:</strong> <span id="storageUsed">Calculando...</span></p>
-                        <p><strong>Versão:</strong> 2.1</p>
+                        <p><strong>Versão:</strong> 2.1.1</p> <!-- Atualize a versão se fizer mais mudanças -->
                     </div>
                 </div>
-
                 <div id="configStatus"></div>
             </div>
         </div>
@@ -945,16 +913,13 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h3>Finalizar Registro</h3>
-                <button class="modal-close" onclick="maintenanceSystem.closeFinalizeModal()">&times;</button>
+                <button class="modal-close" onclick="window.maintenanceSystem && window.maintenanceSystem.closeFinalizeModal()">&times;</button>
             </div>
-            
             <div id="finalizeContent"></div>
-            
             <div class="form-group">
                 <label for="dataHoraLiberacao">Data e Hora de Liberação</label>
                 <input type="datetime-local" id="dataHoraLiberacao" name="dataHoraLiberacao">
             </div>
-
             <div class="form-group">
                 <label for="aprovacao">Status da Manutenção</label>
                 <select id="aprovacao" name="aprovacao">
@@ -963,34 +928,27 @@
                     <option value="Reprovada">Manutenção Reprovada</option>
                 </select>
             </div>
-
             <div class="form-group">
                 <label for="descricaoFinalizacao">Descrição/Observação</label>
                 <textarea id="descricaoFinalizacao" rows="4" placeholder="Adicione observações sobre a manutenção..."></textarea>
             </div>
-
             <div class="camera-section">
                 <h4>Fotos Adicionais (Após Manutenção)</h4>
-                
                 <div class="camera-controls">
                     <button type="button" class="btn btn-primary" id="startCameraFinalize">Abrir Câmera</button>
                     <button type="button" class="btn btn-success" id="capturePhotoFinalize" disabled>Capturar</button>
                     <button type="button" class="btn btn-danger" id="stopCameraFinalize" disabled>Fechar</button>
                 </div>
-
                 <video id="videoElementFinalize" autoplay playsinline muted style="display: none;"></video>
                 <canvas id="canvasFinalize" style="display: none;"></canvas>
-                
                 <div class="photos-preview" id="photosPreviewFinalize"></div>
             </div>
-
             <div id="timeCalculation" class="time-calculation"></div>
-
             <div style="display: flex; gap: 10px; margin-top: 20px;">
-                <button class="btn btn-success" onclick="maintenanceSystem.saveFinalization()" style="flex: 1;">
+                <button class="btn btn-success" onclick="window.maintenanceSystem && window.maintenanceSystem.saveFinalization()" style="flex: 1;">
                     Salvar Finalização
                 </button>
-                <button class="btn btn-danger" onclick="maintenanceSystem.closeFinalizeModal()" style="flex: 1;">
+                <button class="btn btn-danger" onclick="window.maintenanceSystem && window.maintenanceSystem.closeFinalizeModal()" style="flex: 1;">
                     Cancelar
                 </button>
             </div>
@@ -999,19 +957,97 @@
 
     <!-- Image Viewer -->
     <div id="imageViewer" class="image-viewer hidden">
-        <button class="close-btn" onclick="maintenanceSystem.closeImageViewer()">&times;</button>
+        <button class="close-btn" onclick="window.maintenanceSystem && window.maintenanceSystem.closeImageViewer()">&times;</button>
         <img id="viewerImage" src="" alt="Imagem ampliada">
     </div>
 
     <script>
+        console.log('Bloco de script principal iniciado.');
+
+        // Navigation functions (definida primeiro)
+        function showSection(sectionName, clickedButton) {
+            console.log(`[NAV] showSection chamada com: ${sectionName}`);
+            try {
+                document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+                if (clickedButton && typeof clickedButton.classList !== 'undefined') {
+                    clickedButton.classList.add('active');
+                } else {
+                    console.warn(`[NAV] clickedButton não era um elemento válido para ${sectionName}. Tentando fallback.`);
+                    const fallbackButton = Array.from(document.querySelectorAll('.nav-btn')).find(btn => btn.onclick && btn.onclick.toString().includes(`showSection('${sectionName}'`));
+                    if (fallbackButton) fallbackButton.classList.add('active');
+                    else console.error(`[NAV] Fallback para encontrar botão de ${sectionName} falhou.`);
+                }
+                
+                document.querySelectorAll('.section').forEach(section => section.classList.remove('active'));
+                const sectionElement = document.getElementById(sectionName);
+                if (sectionElement) {
+                    sectionElement.classList.add('active');
+                    console.log(`[NAV] Seção '${sectionName}' ativada.`);
+                } else {
+                    console.error(`[NAV] Seção com ID '${sectionName}' não encontrada no DOM.`);
+                    return;
+                }
+                
+                if (window.maintenanceSystem) {
+                    if (sectionName === 'registros') {
+                        window.maintenanceSystem.loadRecords();
+                    }
+                    if (sectionName === 'configuracoes') {
+                        window.maintenanceSystem.updateConnectionStatus(!!window.maintenanceSystem.googleScriptUrl, window.maintenanceSystem.lastConnectionError || (window.maintenanceSystem.connectionTested ? 'Conectado' : 'Status desconhecido'));
+                        requestAnimationFrame(() => { 
+                            if (document.getElementById('localRecordsCount')) {
+                                window.maintenanceSystem.updateSystemStats();
+                            } else {
+                                console.warn("[NAV] Elemento 'localRecordsCount' não encontrado ao tentar atualizar stats para config.");
+                            }
+                        });
+                    }
+                } else {
+                    console.warn(`[NAV] maintenanceSystem não está disponível para showSection quando processando '${sectionName}'. Isso pode ser normal se o erro for na inicialização.`);
+                }
+            } catch (error) {
+                console.error('[NAV] Erro dentro de showSection:', error);
+            }
+        }
+        console.log('Função showSection definida.');
+
         class MaintenanceSystem {
             constructor() {
-                this.video = document.getElementById('videoElement');
-                this.videoFinalize = document.getElementById('videoElementFinalize');
-                this.canvas = document.getElementById('canvas');
-                this.canvasFinalize = document.getElementById('canvasFinalize');
-                this.ctx = this.canvas.getContext('2d');
-                this.ctxFinalize = this.canvasFinalize.getContext('2d');
+                console.log('[SYS] MaintenanceSystem constructor iniciado.');
+                this.domIds = {
+                    video: 'videoElement', videoFinalize: 'videoElementFinalize',
+                    canvas: 'canvas', canvasFinalize: 'canvasFinalize',
+                    dataRegistro: 'dataRegistro', horaProblema: 'horaProblema', horaComunicacao: 'horaComunicacao',
+                    responsavel: 'responsavel', tipoEquipamento: 'tipoEquipamento', placa: 'placa',
+                    recordCount: 'recordCount', photoCount: 'photoCount', systemStatus: 'systemStatus',
+                    formStatus: 'formStatus', configStatus: 'configStatus', reportStatus: 'reportStatus',
+                    recordsList: 'recordsList', diagnosticsResults: 'diagnosticsResults',
+                    connectionStatus: 'connectionStatus', currentUrl: 'currentUrl',
+                    localRecordsCount: 'localRecordsCount', localPhotosCount: 'localPhotosCount',
+                    storageUsed: 'storageUsed', imageViewer: 'imageViewer', viewerImage: 'viewerImage',
+                    copyNotification: 'copyNotification', finalizeModal: 'finalizeModal',
+                    finalizeContent: 'finalizeContent', originalPhotos: 'originalPhotos',
+                    dataHoraLiberacao: 'dataHoraLiberacao', aprovacao: 'aprovacao',
+                    descricaoFinalizacao: 'descricaoFinalizacao', photosPreviewFinalize: 'photosPreviewFinalize',
+                    timeCalculation: 'timeCalculation', photosPreview: 'photosPreview',
+                    searchId: 'searchId', searchDate: 'searchDate', searchPlaca: 'searchPlaca',
+                    searchEquipamento: 'searchEquipamento', searchStatus: 'searchStatus',
+                    searchResponsavel: 'searchResponsavel', reportType: 'reportType', reportPeriod: 'reportPeriod',
+                    importFile: 'importFile', maintenanceForm: 'maintenanceForm'
+                };
+
+                this.video = document.getElementById(this.domIds.video);
+                this.videoFinalize = document.getElementById(this.domIds.videoFinalize);
+                this.canvas = document.getElementById(this.domIds.canvas);
+                this.canvasFinalize = document.getElementById(this.domIds.canvasFinalize);
+
+                if (!this.video || !this.videoFinalize || !this.canvas || !this.canvasFinalize) {
+                    this.log("CONSTRUCTOR: Um ou mais elementos de vídeo/canvas não foram encontrados no DOM.", "error");
+                }
+                
+                this.ctx = this.canvas ? this.canvas.getContext('2d') : null;
+                this.ctxFinalize = this.canvasFinalize ? this.canvasFinalize.getContext('2d') : null;
+                
                 this.photos = [];
                 this.photosFinalize = [];
                 this.stream = null;
@@ -1020,58 +1056,121 @@
                 this.currentRecord = null;
                 this.filteredRecords = [];
                 
-                // URL do Google Apps Script - CONFIGURE AQUI
                 this.googleScriptUrl = 'https://script.google.com/macros/s/AKfycbzZZ7d0fhOZtCujpUkutdhM36burqPv03CKBZsPM5Oay1O-4Lm8u2_V3iP0wX2C_QGWVQ/exec';
                 
-                // Debug flags
                 this.debugMode = true;
                 this.connectionTested = false;
                 this.lastConnectionError = null;
                 
-                // Initialize system
-                this.initializeSystem();
+                try {
+                    this.initializeSystem();
+                } catch (initError) {
+                    this.log(`CONSTRUCTOR: Erro síncrono durante a chamada a initializeSystem: ${initError.message}`, "error", initError);
+                }
+                this.log('MaintenanceSystem constructor concluído.');
             }
 
-            async initializeSystem() {
-                this.log('Iniciando MaintenanceSystem...');
-                
-                // Set current date/time
-                const now = new Date();
-                document.getElementById('dataRegistro').value = now.toISOString().split('T')[0];
-                document.getElementById('horaProblema').value = now.toTimeString().slice(0,5);
-                document.getElementById('horaComunicacao').value = now.toTimeString().slice(0,5);
-                
-                // Load cache data
-                this.loadCacheData();
-                
-                // Setup event listeners
-                this.setupEventListeners();
-                
-                // Update system status
-                this.updateSystemStatus();
-                
-                // Load existing records
-                this.loadRecords();
-                
-                // Auto-uppercase for search fields
-                this.setupSearchFieldsFormatting();
-                
-                // Test connection in background
-                setTimeout(() => this.testConnection(), 1000);
-                
-                this.log('MaintenanceSystem inicializado com sucesso');
-            }
-
-            log(message, type = 'info') {
+            log(message, type = 'info', errorObj = null) {
                 if (this.debugMode) {
                     const timestamp = new Date().toLocaleString('pt-BR');
-                    console.log(`[${timestamp}] ${message}`);
+                    const logMessage = `[GrupoGPS System][${type.toUpperCase()}] ${timestamp}: ${message}`;
+                    
+                    if (type === 'error') {
+                        console.error(logMessage);
+                        if (errorObj) console.error("Detalhes do erro:", errorObj, errorObj.stack);
+                    } else if (type === 'warn') {
+                        console.warn(logMessage);
+                    } else {
+                        console.log(logMessage);
+                    }
                 }
             }
 
+            async initializeSystem() {
+                this.log('Iniciando MaintenanceSystem.initializeSystem()...');
+                
+                const dataRegistroEl = document.getElementById(this.domIds.dataRegistro);
+                const horaProblemaEl = document.getElementById(this.domIds.horaProblema);
+                const horaComunicacaoEl = document.getElementById(this.domIds.horaComunicacao);
+
+                if (!dataRegistroEl || !horaProblemaEl || !horaComunicacaoEl) {
+                    this.log("INITIALIZE_SYSTEM: Elementos de data/hora não encontrados no DOM.", "error");
+                    return; 
+                }
+
+                const now = new Date();
+                dataRegistroEl.value = now.toISOString().split('T')[0];
+                horaProblemaEl.value = now.toTimeString().slice(0,5);
+                horaComunicacaoEl.value = now.toTimeString().slice(0,5);
+                
+                this.loadCacheData();
+                this.setupEventListeners();
+                this.updateSystemStatus();
+                this.loadRecords();
+                this.setupSearchFieldsFormatting();
+                
+                setTimeout(async () => {
+                    if (typeof this.testConnection === 'function') {
+                        await this.testConnection(); // Tornar a chamada await se testConnection for async
+                    } else {
+                        this.log("INITIALIZE_SYSTEM: this.testConnection não é uma função.", "error");
+                    }
+                }, 1000);
+                
+                this.log('MaintenanceSystem.initializeSystem() concluído com sucesso');
+            }
+            
+            setupEventListeners() {
+                this.log('Configurando event listeners...');
+                const placaInput = document.getElementById(this.domIds.placa);
+                if (placaInput) {
+                    placaInput.addEventListener('input', (e) => { e.target.value = e.target.value.toUpperCase(); });
+                } else { this.log("Elemento 'placa' não encontrado para event listener.", "warn"); }
+
+                const btnSetup = [
+                    { id: 'startCamera', action: () => this.startCamera() },
+                    { id: 'capturePhoto', action: () => this.capturePhoto() },
+                    { id: 'stopCamera', action: () => this.stopCamera() },
+                    { id: 'startCameraFinalize', action: () => this.startCamera(true) },
+                    { id: 'capturePhotoFinalize', action: () => this.capturePhoto(true) },
+                    { id: 'stopCameraFinalize', action: () => this.stopCamera(true) }
+                ];
+
+                btnSetup.forEach(btnConfig => {
+                    const btnElement = document.getElementById(btnConfig.id);
+                    if (btnElement) {
+                        btnElement.addEventListener('click', btnConfig.action);
+                    } else {
+                        this.log(`Elemento '${btnConfig.id}' não encontrado para event listener.`, "warn");
+                    }
+                });
+                
+                const maintenanceFormEl = document.getElementById(this.domIds.maintenanceForm);
+                if (maintenanceFormEl) {
+                    maintenanceFormEl.addEventListener('submit', (e) => this.submitForm(e));
+                } else { this.log("Elemento 'maintenanceForm' não encontrado.", "warn"); }
+
+                [this.domIds.responsavel, this.domIds.tipoEquipamento].forEach(fieldId => {
+                    const fieldEl = document.getElementById(fieldId);
+                    if (fieldEl) {
+                        fieldEl.addEventListener('change', () => this.saveCacheData());
+                    } else {
+                        this.log(`Elemento '${fieldId}' não encontrado para cache de formulário.`, "warn");
+                    }
+                });
+
+                const dataHoraLiberacaoEl = document.getElementById(this.domIds.dataHoraLiberacao);
+                if (dataHoraLiberacaoEl) {
+                    dataHoraLiberacaoEl.addEventListener('change', () => this.calculateMaintenanceTime());
+                } else {
+                    this.log("Elemento 'dataHoraLiberacao' não encontrado.", "warn");
+                }
+                this.log('Event listeners configurados.');
+            }
+
             async testConnection() {
-                const button = document.querySelector('button[onclick="maintenanceSystem.testConnection()"]');
-                const originalText = button ? button.textContent : '';
+                const button = document.querySelector(`button[onclick="window.maintenanceSystem && window.maintenanceSystem.testConnection()"]`);
+                const originalText = button ? button.textContent : 'Testar Conexão';
                 
                 if (button) {
                     button.textContent = 'Testando...';
@@ -1079,569 +1178,593 @@
                 }
                 
                 if (!this.googleScriptUrl) {
-                    this.updateConnectionStatus(false, 'URL não configurada');
-                    this.showStatus('configStatus', 'URL do Google Apps Script não configurada.', 'error');
+                    this.updateConnectionStatus(false, 'URL do Apps Script não configurada.');
+                    this.showStatus(this.domIds.configStatus, 'URL do Google Apps Script não configurada.', 'error');
                     if (button) {
                         button.textContent = '✗ Não configurado';
-                        button.style.background = '#ffc107';
+                        button.style.background = '#ffc107'; // Amarelo
                         setTimeout(() => {
-                            button.textContent = originalText;
-                            button.style.background = '';
-                            button.disabled = false;
-                        }, 2000);
+                            if (button) { // Verificar se o botão ainda existe
+                                button.textContent = originalText;
+                                button.style.background = '';
+                                button.disabled = false;
+                            }
+                        }, 3000);
                     }
                     return false;
                 }
                 
+                this.log('Testando conexão com Google Apps Script...');
                 try {
-                    this.log('Testando conexão com Google Apps Script...', 'info');
-                    
-                    // Fazer uma requisição real para testar a conectividade
-                    const testUrl = `${this.googleScriptUrl}?action=config&t=${Date.now()}`;
+                    const testUrl = `${this.googleScriptUrl}?action=config&t=${Date.now()}`; // action=config é mais robusto
                     const response = await fetch(testUrl, {
                         method: 'GET',
-                        headers: {
-                            'Accept': 'application/json',
-                            'Content-Type': 'application/json',
-                        },
-                        mode: 'cors'
+                        mode: 'cors', // Necessário para Apps Script
+                        headers: { 'Accept': 'application/json' }
                     });
                     
-                    this.log(`Resposta recebida - Status: ${response.status}`, 'info');
+                    this.log(`Resposta do teste de conexão - Status: ${response.status}`);
                     
                     if (response.ok) {
-                        // Tentar ler a resposta como JSON
-                        try {
-                            const data = await response.json();
-                            this.log('Dados de resposta: ' + JSON.stringify(data), 'success');
-                            
-                            if (data.success) {
-                                this.connectionTested = true;
-                                this.lastConnectionError = null;
-                                this.updateConnectionStatus(true, 'Conectado e funcionando');
-                                this.showStatus('configStatus', 'Conexão testada com sucesso!', 'success');
-                                
-                                if (button) {
-                                    button.textContent = '✓ Conectado';
-                                    button.style.background = '#28a745';
-                                    setTimeout(() => {
-                                        button.textContent = originalText;
-                                        button.style.background = '';
-                                        button.disabled = false;
-                                    }, 2000);
-                                }
-                                return true;
-                            } else {
-                                throw new Error(data.message || 'Resposta indica falha');
-                            }
-                        } catch (jsonError) {
-                            this.log('Erro ao processar JSON da resposta: ' + jsonError.message, 'error');
-                            // Pode ser que a resposta não seja JSON, mas a conexão foi bem-sucedida
-                            const responseText = await response.text();
-                            this.log('Texto da resposta: ' + responseText.substring(0, 200), 'info');
-                            
-                            // Se chegou até aqui, pelo menos a URL está acessível
+                        const data = await response.json();
+                        this.log('Dados de resposta do teste: ' + JSON.stringify(data).substring(0,200), 'info');
+                        
+                        if (data.success && data.config) { // Verificar se a resposta tem a estrutura esperada
                             this.connectionTested = true;
-                            this.updateConnectionStatus(true, 'Conectado (resposta não-JSON)');
-                            this.showStatus('configStatus', 'Conexão estabelecida, mas resposta inesperada.', 'info');
+                            this.lastConnectionError = null;
+                            this.updateConnectionStatus(true, 'Conectado e configurado.');
+                            this.showStatus(this.domIds.configStatus, 'Conexão testada com sucesso!', 'success');
+                            if (button) {
+                                button.textContent = '✓ Conectado';
+                                button.style.background = '#28a745'; // Verde
+                            }
+                            return true;
+                        } else {
+                            throw new Error(data.message || 'Resposta do servidor indica falha na configuração do Apps Script.');
                         }
                     } else {
-                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                        throw new Error(`Erro HTTP ${response.status}: ${response.statusText}. Verifique a URL e as permissões do Apps Script.`);
                     }
-                    
                 } catch (error) {
-                    this.log('Falha na conexão: ' + error.message, 'error');
+                    this.log('Falha na conexão: ' + error.message, 'error', error);
                     this.lastConnectionError = error.message;
                     this.connectionTested = false;
-                    this.updateConnectionStatus(false, error.message);
-                    this.showStatus('configStatus', `Falha na conexão: ${error.message}`, 'error');
-                    
+                    this.updateConnectionStatus(false, `Falha: ${error.message.substring(0,100)}...`);
+                    this.showStatus(this.domIds.configStatus, `Falha na conexão: ${error.message}`, 'error');
                     if (button) {
-                        button.textContent = '✗ Falha';
-                        button.style.background = '#dc3545';
-                        setTimeout(() => {
-                            button.textContent = originalText;
-                            button.style.background = '';
-                            button.disabled = false;
-                        }, 2000);
+                        button.textContent = '✗ Falha na Conexão';
+                        button.style.background = '#dc3545'; // Vermelho
                     }
                     return false;
-                }
-                
-                if (button) {
-                    button.disabled = false;
+                } finally {
+                    if (button) {
+                       setTimeout(() => {
+                            if (button) { // Verificar se o botão ainda existe
+                                button.textContent = originalText;
+                                button.style.background = '';
+                                button.disabled = false;
+                            }
+                        }, 3000);
+                    }
                 }
             }
 
             async runDiagnostics() {
-                const resultsDiv = document.getElementById('diagnosticsResults');
+                const resultsDiv = document.getElementById(this.domIds.diagnosticsResults);
+                if (!resultsDiv) {
+                    this.log("Elemento 'diagnosticsResults' não encontrado.", "error");
+                    return;
+                }
                 resultsDiv.innerHTML = '<div class="debug-info">🔍 Executando diagnóstico...</div>';
                 
                 const diagnostics = [];
+                const addDiag = (test, result, details, type) => diagnostics.push({ test, result, details, type });
+
+                addDiag('URL Configurada', this.googleScriptUrl ? 'OK' : 'FALHA', this.googleScriptUrl || 'URL não configurada', this.googleScriptUrl ? 'success' : 'error');
                 
-                // 1. Verificar URL do Google Apps Script
-                diagnostics.push({
-                    test: 'URL Configurada',
-                    result: this.googleScriptUrl ? 'OK' : 'FALHA',
-                    details: this.googleScriptUrl || 'URL não configurada',
-                    type: this.googleScriptUrl ? 'success' : 'error'
-                });
-                
-                // 2. Testar conectividade básica
-                try {
-                    const response = await fetch(this.googleScriptUrl + '?test=ping', {
-                        method: 'GET',
-                        mode: 'no-cors'
-                    });
-                    diagnostics.push({
-                        test: 'Conectividade Básica',
-                        result: 'OK',
-                        details: 'Requisição enviada sem erro de rede',
-                        type: 'success'
-                    });
-                } catch (error) {
-                    diagnostics.push({
-                        test: 'Conectividade Básica',
-                        result: 'FALHA',
-                        details: error.message,
-                        type: 'error'
-                    });
+                if (this.googleScriptUrl) {
+                    try {
+                        this.log('[DIAG] Testando conectividade básica...');
+                        const pingUrl = `${this.googleScriptUrl}?test=ping&t=${Date.now()}`; // Adicionado timestamp para evitar cache
+                        const response = await fetch(pingUrl, { method: 'GET', mode: 'cors' });
+                        if (response.ok) {
+                            const data = await response.json(); // Espera JSON do Apps Script
+                            if (data.success) {
+                                addDiag('Conectividade Apps Script (Ping)', 'OK', `Resposta: ${data.message}`, 'success');
+                            } else {
+                                addDiag('Conectividade Apps Script (Ping)', 'FALHA NO SERVIDOR', `Resposta: ${data.message || 'Erro desconhecido'}`, 'error');
+                            }
+                        } else {
+                             addDiag('Conectividade Apps Script (Ping)', 'FALHA HTTP', `Status: ${response.status} ${response.statusText}`, 'error');
+                        }
+                    } catch (error) {
+                        addDiag('Conectividade Apps Script (Ping)', 'FALHA DE REDE', error.message, 'error');
+                        this.log('[DIAG] Erro no teste de ping: ' + error.message, 'error', error);
+                    }
+                } else {
+                    addDiag('Conectividade Apps Script (Ping)', 'PULADO', 'URL não configurada', 'info');
                 }
-                
-                // 3. Verificar dados locais
+
                 const localRecords = JSON.parse(localStorage.getItem('maintenanceRecords') || '[]');
-                diagnostics.push({
-                    test: 'Dados Locais',
-                    result: localRecords.length > 0 ? 'OK' : 'VAZIO',
-                    details: `${localRecords.length} registros encontrados`,
-                    type: localRecords.length > 0 ? 'success' : 'info'
-                });
+                addDiag('Dados Locais (Registros)', localRecords.length > 0 ? 'OK' : 'VAZIO', `${localRecords.length} registros`, localRecords.length > 0 ? 'success' : 'info');
                 
-                // 4. Verificar fotos locais
                 const photoKeys = Object.keys(localStorage).filter(key => key.startsWith('photos_'));
-                diagnostics.push({
-                    test: 'Fotos Locais',
-                    result: photoKeys.length > 0 ? 'OK' : 'VAZIO',
-                    details: `${photoKeys.length} conjuntos de fotos encontrados`,
-                    type: photoKeys.length > 0 ? 'success' : 'info'
-                });
+                addDiag('Fotos Locais (Conjuntos)', photoKeys.length > 0 ? 'OK' : 'VAZIO', `${photoKeys.length} conjuntos`, photoKeys.length > 0 ? 'success' : 'info');
                 
-                // 5. Verificar espaço do localStorage
                 try {
-                    let totalSize = 0;
-                    Object.keys(localStorage).forEach(key => {
-                        totalSize += localStorage.getItem(key).length;
-                    });
+                    let totalSize = 0; Object.keys(localStorage).forEach(key => { totalSize += (localStorage.getItem(key) || '').length; });
                     const sizeInMB = (totalSize / (1024 * 1024)).toFixed(2);
-                    
-                    diagnostics.push({
-                        test: 'Espaço de Armazenamento',
-                        result: totalSize > 0 ? 'OK' : 'VAZIO',
-                        details: `${sizeInMB} MB utilizados`,
-                        type: parseFloat(sizeInMB) > 5 ? 'info' : 'success'
-                    });
-                } catch (error) {
-                    diagnostics.push({
-                        test: 'Espaço de Armazenamento',
-                        result: 'ERRO',
-                        details: error.message,
-                        type: 'error'
-                    });
+                    addDiag('Espaço localStorage Usado', sizeInMB + ' MB', `Total de ${Object.keys(localStorage).length} chaves`, parseFloat(sizeInMB) > 4 ? 'warn' : 'success');
+                } catch (error) { addDiag('Espaço localStorage', 'ERRO', error.message, 'error'); }
+                
+                if (this.googleScriptUrl && this.connectionTested) { // Só testa envio se conexão parece OK
+                    try {
+                        this.log('[DIAG] Testando envio de dados...');
+                        const testData = {
+                            id: 'DIAG_TEST_' + Date.now(), responsavel: 'Diagnóstico Automático', placa: 'DIAG-001',
+                            tipoEquipamento: 'Alta Pressão', dataRegistro: new Date().toISOString().split('T')[0],
+                            problema: 'Teste de envio de dados do diagnóstico', horaProblema: '00:00', horaComunicacao: '00:01',
+                            status: 'Aberto', fotos: [], fotosFinalizacaoData: [], timestamp: new Date().toISOString(),
+                            teste: true // Flag especial para o backend não salvar de verdade
+                        };
+                        // Simular this.photos e this.photosFinalize para saveToGoogleSheets
+                        const originalPhotos = this.photos; this.photos = [];
+                        const originalPhotosFinalize = this.photosFinalize; this.photosFinalize = [];
+
+                        const response = await this.saveToGoogleSheets(testData); // saveToGoogleSheets deve lidar com a flag 'teste'
+
+                        this.photos = originalPhotos; this.photosFinalize = originalPhotosFinalize;
+
+                        if (response && response.success && response.testMode) {
+                             addDiag('Envio de Dados (Teste)', 'OK', `Servidor respondeu ao modo teste: ${response.message}`, 'success');
+                        } else if (response && !response.success) {
+                             addDiag('Envio de Dados (Teste)', 'FALHA NO SERVIDOR', `Servidor respondeu com erro: ${response.message || 'Desconhecido'}`, 'error');
+                        } else {
+                             addDiag('Envio de Dados (Teste)', 'RESPOSTA INESPERADA', `Resposta do servidor: ${JSON.stringify(response).substring(0,100)}...`, 'warn');
+                        }
+                    } catch (error) {
+                        addDiag('Envio de Dados (Teste)', 'FALHA NA REQUISIÇÃO', error.message, 'error');
+                        this.log('[DIAG] Erro no teste de envio: ' + error.message, 'error', error);
+                    }
+                } else {
+                     addDiag('Envio de Dados (Teste)', 'PULADO', 'URL não configurada ou conexão não testada/falhou', 'info');
                 }
                 
-                // 6. Testar envio de dados fictícios
-                try {
-                    const testData = {
-                        id: 'TEST_' + Date.now(),
-                        responsavel: 'Teste Diagnóstico',
-                        test: true
-                    };
-                    
-                    await this.saveToGoogleSheets(testData);
-                    diagnostics.push({
-                        test: 'Envio de Dados',
-                        result: 'OK',
-                        details: 'Dados de teste enviados com sucesso',
-                        type: 'success'
-                    });
-                } catch (error) {
-                    diagnostics.push({
-                        test: 'Envio de Dados',
-                        result: 'FALHA',
-                        details: error.message,
-                        type: 'error'
-                    });
-                }
-                
-                // Exibir resultados
                 let html = '';
                 diagnostics.forEach(diag => {
                     const className = diag.type === 'success' ? 'debug-success' : 
-                                    diag.type === 'error' ? 'debug-error' : 'debug-info';
-                    html += `
-                        <div class="${className}">
-                            <strong>${diag.test}:</strong> ${diag.result}<br>
-                            <small>${diag.details}</small>
-                        </div>
-                    `;
+                                    diag.type === 'error' ? 'debug-error' : 
+                                    diag.type === 'warn' ? 'debug-info' : 'debug-info'; // Usar debug-info para warn também
+                    html += `<div class="${className}"><strong>${diag.test}:</strong> ${diag.result}<br><small>${diag.details}</small></div>`;
                 });
-                
                 resultsDiv.innerHTML = html;
                 this.log('Diagnóstico concluído', 'success');
             }
 
             updateConnectionStatus(isConnected, details = '') {
-                const statusElement = document.getElementById('connectionStatus');
-                const systemStatusElement = document.getElementById('systemStatus');
-                const currentUrlElement = document.getElementById('currentUrl');
+                const statusElement = document.getElementById(this.domIds.connectionStatus);
+                const systemStatusElement = document.getElementById(this.domIds.systemStatus);
+                const currentUrlElement = document.getElementById(this.domIds.currentUrl);
                 
                 if (statusElement) {
                     if (isConnected) {
-                        statusElement.textContent = `Conectado${details ? ` - ${details}` : ''}`;
+                        statusElement.textContent = `Online ${details ? `- ${details}` : ''}`;
                         statusElement.style.color = '#28a745';
                     } else {
-                        statusElement.textContent = `Offline${details ? ` - ${details}` : ''}`;
+                        statusElement.textContent = `Offline ${details ? `- ${details}` : ''}`;
                         statusElement.style.color = '#dc3545';
                     }
-                }
+                } else { this.log("Elemento 'connectionStatus' não encontrado para atualizar.", "warn"); }
                 
                 if (systemStatusElement) {
                     if (isConnected) {
-                        systemStatusElement.textContent = 'Sistema Online - Google Conectado';
+                        systemStatusElement.textContent = 'Sistema Online - Sincronizando';
                         systemStatusElement.style.color = '#28a745';
                     } else {
                         systemStatusElement.textContent = 'Sistema Offline - Modo Local';
-                        systemStatusElement.style.color = '#ffc107';
+                        systemStatusElement.style.color = this.googleScriptUrl ? '#ffc107' : '#dc3545'; // Amarelo se URL existe mas offline, Vermelho se nem URL
                     }
-                }
+                } else { this.log("Elemento 'systemStatus' não encontrado para atualizar.", "warn"); }
                 
                 if (currentUrlElement) {
                     currentUrlElement.textContent = this.googleScriptUrl ? 
-                        this.googleScriptUrl.substring(0, 60) + '...' : 
+                        (this.googleScriptUrl.length > 60 ? this.googleScriptUrl.substring(0, 60) + '...' : this.googleScriptUrl) : 
                         'Não configurado';
-                }
+                } else { this.log("Elemento 'currentUrl' não encontrado para atualizar.", "warn"); }
             }
 
             loadCacheData() {
-                // Load cached form data
                 const cachedData = localStorage.getItem('formCache');
                 if (cachedData) {
                     try {
                         const data = JSON.parse(cachedData);
-                        if (data.responsavel) document.getElementById('responsavel').value = data.responsavel;
-                        if (data.tipoEquipamento) document.getElementById('tipoEquipamento').value = data.tipoEquipamento;
+                        const responsavelEl = document.getElementById(this.domIds.responsavel);
+                        const tipoEquipamentoEl = document.getElementById(this.domIds.tipoEquipamento);
+
+                        if (responsavelEl && data.responsavel) responsavelEl.value = data.responsavel;
+                        if (tipoEquipamentoEl && data.tipoEquipamento) tipoEquipamentoEl.value = data.tipoEquipamento;
+                        this.log('Cache do formulário carregado.');
                     } catch (error) {
-                        this.log('Erro ao carregar cache: ' + error.message, 'error');
+                        this.log('Erro ao carregar cache do formulário: ' + error.message, 'error', error);
                     }
                 }
             }
 
             saveCacheData() {
+                const responsavelEl = document.getElementById(this.domIds.responsavel);
+                const tipoEquipamentoEl = document.getElementById(this.domIds.tipoEquipamento);
+                if (!responsavelEl || !tipoEquipamentoEl) {
+                    this.log("Elementos de formulário não encontrados para salvar cache.", "warn");
+                    return;
+                }
                 const formData = {
-                    responsavel: document.getElementById('responsavel').value,
-                    tipoEquipamento: document.getElementById('tipoEquipamento').value
+                    responsavel: responsavelEl.value,
+                    tipoEquipamento: tipoEquipamentoEl.value
                 };
                 localStorage.setItem('formCache', JSON.stringify(formData));
-            }
-
-            setupEventListeners() {
-                // Camera controls
-                document.getElementById('startCamera').addEventListener('click', () => this.startCamera());
-                document.getElementById('capturePhoto').addEventListener('click', () => this.capturePhoto());
-                document.getElementById('stopCamera').addEventListener('click', () => this.stopCamera());
-                
-                // Finalize camera controls
-                document.getElementById('startCameraFinalize').addEventListener('click', () => this.startCamera(true));
-                document.getElementById('capturePhotoFinalize').addEventListener('click', () => this.capturePhoto(true));
-                document.getElementById('stopCameraFinalize').addEventListener('click', () => this.stopCamera(true));
-                
-                // Form submission
-                document.getElementById('maintenanceForm').addEventListener('submit', (e) => this.submitForm(e));
-                
-                // Auto-uppercase placa
-                document.getElementById('placa').addEventListener('input', (e) => {
-                    e.target.value = e.target.value.toUpperCase();
-                });
-
-                // Save cache on form changes
-                ['responsavel', 'tipoEquipamento'].forEach(field => {
-                    document.getElementById(field).addEventListener('change', () => this.saveCacheData());
-                });
-
-                // Auto-calculate time when date/time changes
-                document.getElementById('dataHoraLiberacao').addEventListener('change', () => this.calculateMaintenanceTime());
+                this.log('Cache do formulário salvo.');
             }
 
             setupSearchFieldsFormatting() {
-                // Auto-uppercase for search placa
-                document.getElementById('searchPlaca').addEventListener('input', (e) => {
-                    e.target.value = e.target.value.toUpperCase();
-                });
+                const searchPlacaEl = document.getElementById(this.domIds.searchPlaca);
+                if (searchPlacaEl) {
+                    searchPlacaEl.addEventListener('input', (e) => { e.target.value = e.target.value.toUpperCase(); });
+                } else { this.log("Elemento 'searchPlaca' não encontrado para formatação.", "warn"); }
             }
 
-            updateSystemStatus() {
+            updateSystemStatus() { // Esta função pode ser combinada com updateCounts ou se tornar mais específica
                 this.updateCounts();
+                this.log('Status geral do sistema atualizado (contagens).');
             }
 
             updateCounts() {
+                const recordCountEl = document.getElementById(this.domIds.recordCount);
+                const photoCountEl = document.getElementById(this.domIds.photoCount);
+
                 const records = JSON.parse(localStorage.getItem('maintenanceRecords') || '[]');
-                document.getElementById('recordCount').textContent = records.length;
+                if (recordCountEl) recordCountEl.textContent = records.length;
                 
                 const photoKeys = Object.keys(localStorage).filter(key => key.startsWith('photos_'));
-                document.getElementById('photoCount').textContent = photoKeys.length;
+                if (photoCountEl) photoCountEl.textContent = photoKeys.length;
             }
 
-            updateSystemStats() {
+            updateSystemStats() { // Chamado na aba de Configurações
                 const records = JSON.parse(localStorage.getItem('maintenanceRecords') || '[]');
                 const photoKeys = Object.keys(localStorage).filter(key => key.startsWith('photos_'));
                 
-                // Update counts
-                const localRecordsElement = document.getElementById('localRecordsCount');
-                const localPhotosElement = document.getElementById('localPhotosCount');
-                const storageUsedElement = document.getElementById('storageUsed');
+                const localRecordsElement = document.getElementById(this.domIds.localRecordsCount);
+                const localPhotosElement = document.getElementById(this.domIds.localPhotosCount);
+                const storageUsedElement = document.getElementById(this.domIds.storageUsed);
                 
                 if (localRecordsElement) localRecordsElement.textContent = records.length;
+                else this.log("Elemento 'localRecordsCount' não encontrado para stats.", "warn");
+
                 if (localPhotosElement) localPhotosElement.textContent = photoKeys.length;
+                else this.log("Elemento 'localPhotosCount' não encontrado para stats.", "warn");
                 
-                // Calculate storage usage
                 if (storageUsedElement) {
                     try {
                         let totalSize = 0;
-                        Object.keys(localStorage).forEach(key => {
-                            totalSize += localStorage.getItem(key).length;
-                        });
+                        Object.keys(localStorage).forEach(key => { totalSize += (localStorage.getItem(key) || '').length; });
                         const sizeInMB = (totalSize / (1024 * 1024)).toFixed(2);
                         storageUsedElement.textContent = `${sizeInMB} MB`;
                     } catch (error) {
                         storageUsedElement.textContent = 'Erro ao calcular';
+                        this.log('Erro ao calcular uso do localStorage: ' + error.message, 'error', error);
                     }
-                }
+                } else { this.log("Elemento 'storageUsed' não encontrado para stats.", "warn"); }
+                this.log('Estatísticas do sistema na aba Config atualizadas.');
             }
 
             clearLocalData() {
-                if (confirm('Tem certeza que deseja limpar todos os dados locais? Esta ação não pode ser desfeita.')) {
-                    const keys = Object.keys(localStorage);
-                    keys.forEach(key => {
-                        if (key.startsWith('maintenanceRecords') || key.startsWith('photos_') || key.startsWith('formCache')) {
-                            localStorage.removeItem(key);
+                if (confirm('Tem certeza que deseja limpar TODOS os dados locais (registros e fotos)? Esta ação NÃO PODE SER DESFEITA.')) {
+                    this.log('Iniciando limpeza de dados locais...');
+                    const keysToRemove = [];
+                    for (let i = 0; i < localStorage.length; i++) {
+                        const key = localStorage.key(i);
+                        if (key && (key.startsWith('maintenanceRecords') || key.startsWith('photos_') || key.startsWith('formCache'))) {
+                            keysToRemove.push(key);
                         }
-                    });
+                    }
+                    keysToRemove.forEach(key => localStorage.removeItem(key));
                     
                     this.records = [];
                     this.filteredRecords = [];
-                    this.photos = [];
+                    this.photos = []; 
                     this.photosFinalize = [];
                     
                     this.updateCounts();
-                    this.updateSystemStats();
-                    this.loadRecords();
+                    this.updateSystemStats(); // Atualiza stats na aba config, se aberta
+                    this.loadRecords(); // Atualiza a lista de registros, que agora estará vazia
                     
-                    this.showStatus('configStatus', 'Todos os dados locais foram removidos.', 'success');
+                    this.showStatus(this.domIds.configStatus, 'Todos os dados locais foram removidos.', 'success');
+                    this.log('Todos os dados locais removidos.', 'warn');
                 }
             }
 
             exportLocalData() {
                 try {
-                    const data = {
+                    const dataToExport = {
                         records: JSON.parse(localStorage.getItem('maintenanceRecords') || '[]'),
                         photos: {},
-                        exportDate: new Date().toISOString()
+                        formCache: JSON.parse(localStorage.getItem('formCache') || '{}'),
+                        exportDate: new Date().toISOString(),
+                        appVersion: "2.1.1" // Adicionar versão da app ao exportar
                     };
                     
-                    // Export photos
                     Object.keys(localStorage).forEach(key => {
                         if (key.startsWith('photos_')) {
-                            data.photos[key] = JSON.parse(localStorage.getItem(key));
+                            try { dataToExport.photos[key] = JSON.parse(localStorage.getItem(key)); }
+                            catch (e) { this.log(`Erro ao parsear fotos ${key} para exportação: ${e.message}`, 'warn');}
                         }
                     });
                     
-                    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                    const blob = new Blob([JSON.stringify(dataToExport, null, 2)], { type: 'application/json' });
                     const url = URL.createObjectURL(blob);
                     const a = document.createElement('a');
                     a.href = url;
                     a.download = `grupogps_backup_${new Date().toISOString().split('T')[0]}.json`;
+                    document.body.appendChild(a); // Necessário para Firefox
                     a.click();
+                    document.body.removeChild(a);
                     URL.revokeObjectURL(url);
                     
-                    this.showStatus('configStatus', 'Dados exportados com sucesso!', 'success');
+                    this.showStatus(this.domIds.configStatus, 'Dados locais exportados com sucesso!', 'success');
+                    this.log('Dados locais exportados.');
                 } catch (error) {
-                    this.log('Erro ao exportar dados: ' + error.message, 'error');
-                    this.showStatus('configStatus', 'Erro ao exportar dados.', 'error');
+                    this.log('Erro ao exportar dados locais: ' + error.message, 'error', error);
+                    this.showStatus(this.domIds.configStatus, 'Erro ao exportar dados locais.', 'error');
                 }
             }
 
             importLocalData() {
-                const fileInput = document.getElementById('importFile');
+                const fileInput = document.getElementById(this.domIds.importFile);
+                if (!fileInput) {
+                    this.showStatus(this.domIds.configStatus, "Elemento de input de arquivo não encontrado.", "error");
+                    return;
+                }
                 const file = fileInput.files[0];
                 
                 if (!file) {
-                    this.showStatus('configStatus', 'Selecione um arquivo para importar.', 'error');
+                    this.showStatus(this.domIds.configStatus, 'Nenhum arquivo selecionado para importar.', 'error');
                     return;
                 }
                 
+                if (!confirm(`Tem certeza que deseja importar os dados do arquivo "${file.name}"? Isso PODE SOBRESCREVER dados existentes com o mesmo ID.`)) {
+                    fileInput.value = ''; // Limpar seleção
+                    return;
+                }
+
                 const reader = new FileReader();
                 reader.onload = (e) => {
                     try {
-                        const data = JSON.parse(e.target.result);
-                        
-                        if (data.records && Array.isArray(data.records)) {
-                            localStorage.setItem('maintenanceRecords', JSON.stringify(data.records));
+                        const importedData = JSON.parse(e.target.result);
+                        let importedRecordsCount = 0;
+                        let importedPhotosSetsCount = 0;
+
+                        if (importedData.records && Array.isArray(importedData.records)) {
+                            // Poderia fazer merge inteligente aqui, mas por simplicidade, vamos substituir/adicionar
+                            const existingRecords = JSON.parse(localStorage.getItem('maintenanceRecords') || '[]');
+                            const mergedRecords = [...existingRecords];
+
+                            importedData.records.forEach(newRecord => {
+                                const index = mergedRecords.findIndex(r => r.id === newRecord.id);
+                                if (index !== -1) mergedRecords[index] = newRecord; // Substitui
+                                else mergedRecords.push(newRecord); // Adiciona
+                            });
+                            localStorage.setItem('maintenanceRecords', JSON.stringify(mergedRecords));
+                            importedRecordsCount = importedData.records.length;
                         }
                         
-                        if (data.photos && typeof data.photos === 'object') {
-                            Object.keys(data.photos).forEach(key => {
-                                localStorage.setItem(key, JSON.stringify(data.photos[key]));
+                        if (importedData.photos && typeof importedData.photos === 'object') {
+                            Object.keys(importedData.photos).forEach(key => {
+                                if (key.startsWith('photos_')) { // Só importar chaves de fotos
+                                    localStorage.setItem(key, JSON.stringify(importedData.photos[key]));
+                                    importedPhotosSetsCount++;
+                                }
                             });
                         }
+
+                        if (importedData.formCache && typeof importedData.formCache === 'object') {
+                            localStorage.setItem('formCache', JSON.stringify(importedData.formCache));
+                        }
                         
-                        this.loadRecords();
+                        this.loadRecords(); // Recarrega e exibe os registros
                         this.updateCounts();
                         this.updateSystemStats();
                         
-                        this.showStatus('configStatus', 'Dados importados com sucesso!', 'success');
-                        fileInput.value = '';
+                        this.showStatus(this.domIds.configStatus, `Dados importados! ${importedRecordsCount} registros, ${importedPhotosSetsCount} conjuntos de fotos.`, 'success');
+                        this.log(`Dados importados do arquivo ${file.name}.`);
+                        fileInput.value = ''; // Limpa o input de arquivo
                     } catch (error) {
-                        this.log('Erro ao importar dados: ' + error.message, 'error');
-                        this.showStatus('configStatus', 'Erro ao importar dados. Verifique o formato do arquivo.', 'error');
+                        this.log('Erro ao importar dados: ' + error.message, 'error', error);
+                        this.showStatus(this.domIds.configStatus, 'Erro ao importar dados. Verifique o formato do arquivo.', 'error');
                     }
                 };
                 reader.readAsText(file);
             }
 
             async startCamera(isFinalize = false) {
-                const video = isFinalize ? this.videoFinalize : this.video;
-                const canvas = isFinalize ? this.canvasFinalize : this.canvas;
-                const startBtn = document.getElementById(isFinalize ? 'startCameraFinalize' : 'startCamera');
-                const captureBtn = document.getElementById(isFinalize ? 'capturePhotoFinalize' : 'capturePhoto');
-                const stopBtn = document.getElementById(isFinalize ? 'stopCameraFinalize' : 'stopCamera');
+                const videoEl = isFinalize ? this.videoFinalize : this.video;
+                const canvasEl = isFinalize ? this.canvasFinalize : this.canvas; // Não usado diretamente aqui, mas para contexto
+                const startBtnId = isFinalize ? 'startCameraFinalize' : 'startCamera';
+                const captureBtnId = isFinalize ? 'capturePhotoFinalize' : 'capturePhoto';
+                const stopBtnId = isFinalize ? 'stopCameraFinalize' : 'stopCamera';
+
+                const startBtn = document.getElementById(startBtnId);
+                const captureBtn = document.getElementById(captureBtnId);
+                const stopBtn = document.getElementById(stopBtnId);
+
+                if (!videoEl || !startBtn || !captureBtn || !stopBtn) {
+                    this.log(`Elementos da câmera (${isFinalize ? 'Finalize' : 'Inicial'}) não encontrados.`, "error");
+                    this.showStatus(this.domIds.formStatus, 'Erro interno: elementos da câmera ausentes.', 'error');
+                    return;
+                }
 
                 try {
-                    const constraints = {
-                        video: {
-                            width: { ideal: 1920 },
-                            height: { ideal: 1080 },
-                            facingMode: 'environment'
-                        }
-                    };
-
+                    this.log(`Tentando iniciar câmera ${isFinalize ? 'de finalização' : 'inicial'}...`);
+                    const constraints = { video: { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: 'environment' } };
                     const stream = await navigator.mediaDevices.getUserMedia(constraints);
                     
                     if (isFinalize) {
                         this.streamFinalize = stream;
-                        video.style.display = 'block';
+                        videoEl.style.display = 'block'; // Mostrar vídeo de finalização
                     } else {
                         this.stream = stream;
                     }
                     
-                    video.srcObject = stream;
+                    videoEl.srcObject = stream;
                     
-                    video.onloadedmetadata = () => {
-                        canvas.width = video.videoWidth;
-                        canvas.height = video.videoHeight;
+                    videoEl.onloadedmetadata = () => { // Usar uma função de seta para manter o `this`
+                        const targetCanvas = isFinalize ? this.canvasFinalize : this.canvas;
+                        if (targetCanvas) {
+                            targetCanvas.width = videoEl.videoWidth;
+                            targetCanvas.height = videoEl.videoHeight;
+                            this.log(`Metadados da câmera ${isFinalize ? 'de finalização' : 'inicial'} carregados: ${videoEl.videoWidth}x${videoEl.videoHeight}`);
+                        } else {
+                            this.log(`Canvas para câmera ${isFinalize ? 'de finalização' : 'inicial'} não encontrado.`, "warn");
+                        }
                     };
 
                     startBtn.disabled = true;
                     captureBtn.disabled = false;
                     stopBtn.disabled = false;
                     
-                    this.showStatus('formStatus', 'Câmera iniciada com sucesso', 'success');
+                    this.showStatus(this.domIds.formStatus, `Câmera ${isFinalize ? 'de finalização' : 'inicial'} iniciada.`, 'success');
                 } catch (error) {
-                    this.log('Erro ao acessar câmera: ' + error.message, 'error');
-                    this.showStatus('formStatus', 'Erro ao acessar câmera. Verifique as permissões.', 'error');
+                    this.log(`Erro ao acessar câmera ${isFinalize ? 'de finalização' : 'inicial'}: ${error.message}`, 'error', error);
+                    this.showStatus(this.domIds.formStatus, 'Erro ao acessar câmera. Verifique as permissões.', 'error');
+                    // Resetar botões em caso de erro
+                    startBtn.disabled = false;
+                    captureBtn.disabled = true;
+                    stopBtn.disabled = true;
                 }
             }
 
             capturePhoto(isFinalize = false) {
-                const video = isFinalize ? this.videoFinalize : this.video;
-                const canvas = isFinalize ? this.canvasFinalize : this.canvas;
+                const videoEl = isFinalize ? this.videoFinalize : this.video;
+                const canvasEl = isFinalize ? this.canvasFinalize : this.canvas;
                 const ctx = isFinalize ? this.ctxFinalize : this.ctx;
-                const photos = isFinalize ? this.photosFinalize : this.photos;
+                const photosArray = isFinalize ? this.photosFinalize : this.photos;
 
-                if (video.videoWidth === 0 || video.videoHeight === 0) {
-                    this.showStatus('formStatus', 'Aguarde a câmera carregar completamente.', 'error');
+                if (!videoEl || !canvasEl || !ctx) {
+                    this.log(`Elementos de captura de foto (${isFinalize ? 'Finalize' : 'Inicial'}) ausentes.`, "error");
+                    this.showStatus(this.domIds.formStatus, 'Erro interno ao capturar foto.', 'error');
                     return;
                 }
 
-                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-                
-                // Higher quality image
-                const imageData = canvas.toDataURL('image/jpeg', 0.9);
+                if (videoEl.videoWidth === 0 || videoEl.videoHeight === 0 || !videoEl.srcObject || !videoEl.srcObject.active) {
+                    this.log(`Câmera (${isFinalize ? 'Finalize' : 'Inicial'}) não pronta ou stream inativo.`, "warn");
+                    this.showStatus(this.domIds.formStatus, 'Câmera não está pronta ou foi desligada. Tente abrir novamente.', 'error');
+                    return;
+                }
+                // Garantir que as dimensões do canvas correspondem ao vídeo no momento da captura
+                canvasEl.width = videoEl.videoWidth;
+                canvasEl.height = videoEl.videoHeight;
+
+                ctx.drawImage(videoEl, 0, 0, canvasEl.width, canvasEl.height);
+                const imageData = canvasEl.toDataURL('image/jpeg', 0.85); // Qualidade 0.85
                 
                 const photoId = Date.now();
-                const newPhoto = {
-                    id: photoId,
-                    data: imageData,
-                    timestamp: new Date().toLocaleString('pt-BR')
-                };
+                const newPhoto = { id: photoId, data: imageData, timestamp: new Date().toLocaleString('pt-BR') };
 
-                if (isFinalize) {
-                    this.photosFinalize.push(newPhoto);
-                    this.updatePhotosPreview(true);
-                } else {
-                    this.photos.push(newPhoto);
-                    this.updatePhotosPreview();
-                }
+                photosArray.push(newPhoto);
+                this.updatePhotosPreview(isFinalize);
                 
-                this.showStatus('formStatus', `Foto capturada! Total: ${photos.length + (isFinalize ? this.photosFinalize.length : 0)}`, 'success');
+                this.showStatus(this.domIds.formStatus, `Foto ${isFinalize ? 'de finalização' : 'inicial'} capturada! Total: ${photosArray.length}`, 'success');
+                this.log(`Foto ${isFinalize ? 'de finalização' : 'inicial'} capturada. ID: ${photoId}`);
             }
 
             stopCamera(isFinalize = false) {
-                const video = isFinalize ? this.videoFinalize : this.video;
-                const stream = isFinalize ? this.streamFinalize : this.stream;
-                const startBtn = document.getElementById(isFinalize ? 'startCameraFinalize' : 'startCamera');
-                const captureBtn = document.getElementById(isFinalize ? 'capturePhotoFinalize' : 'capturePhoto');
-                const stopBtn = document.getElementById(isFinalize ? 'stopCameraFinalize' : 'stopCamera');
+                const videoEl = isFinalize ? this.videoFinalize : this.video;
+                let streamToStop = isFinalize ? this.streamFinalize : this.stream;
+                
+                const startBtnId = isFinalize ? 'startCameraFinalize' : 'startCamera';
+                const captureBtnId = isFinalize ? 'capturePhotoFinalize' : 'capturePhoto';
+                const stopBtnId = isFinalize ? 'stopCameraFinalize' : 'stopCamera';
 
-                if (stream) {
-                    stream.getTracks().forEach(track => track.stop());
-                    video.srcObject = null;
-                    
-                    if (isFinalize) {
-                        this.streamFinalize = null;
-                        video.style.display = 'none';
-                    } else {
-                        this.stream = null;
-                    }
+                const startBtn = document.getElementById(startBtnId);
+                const captureBtn = document.getElementById(captureBtnId);
+                const stopBtn = document.getElementById(stopBtnId);
+
+                if (!videoEl || !startBtn || !captureBtn || !stopBtn) {
+                     this.log(`Elementos de controle da câmera (${isFinalize ? 'Finalize' : 'Inicial'}) não encontrados para stopCamera.`, "warn");
                 }
 
-                startBtn.disabled = false;
-                captureBtn.disabled = true;
-                stopBtn.disabled = true;
+
+                if (streamToStop) {
+                    streamToStop.getTracks().forEach(track => track.stop());
+                    this.log(`Stream da câmera ${isFinalize ? 'de finalização' : 'inicial'} parado.`);
+                }
+                if (videoEl) videoEl.srcObject = null;
                 
-                this.showStatus('formStatus', 'Câmera desligada.', 'info');
+                if (isFinalize) {
+                    this.streamFinalize = null;
+                    if (videoEl) videoEl.style.display = 'none'; // Esconder vídeo de finalização
+                } else {
+                    this.stream = null;
+                }
+
+                if(startBtn) startBtn.disabled = false;
+                if(captureBtn) captureBtn.disabled = true;
+                if(stopBtn) stopBtn.disabled = true;
+                
+                this.showStatus(this.domIds.formStatus, `Câmera ${isFinalize ? 'de finalização' : 'inicial'} desligada.`, 'info');
             }
 
             updatePhotosPreview(isFinalize = false) {
-                const preview = document.getElementById(isFinalize ? 'photosPreviewFinalize' : 'photosPreview');
-                const photos = isFinalize ? this.photosFinalize : this.photos;
-                const methodName = isFinalize ? 'removePhotoFinalize' : 'removePhoto';
+                const previewId = isFinalize ? this.domIds.photosPreviewFinalize : this.domIds.photosPreview;
+                const previewEl = document.getElementById(previewId);
+                const photosArray = isFinalize ? this.photosFinalize : this.photos;
+                const removeMethodName = isFinalize ? 'removePhotoFinalize' : 'removePhoto';
+
+                if (!previewEl) {
+                    this.log(`Elemento de preview de fotos '${previewId}' não encontrado.`, "warn");
+                    return;
+                }
                 
-                preview.innerHTML = photos.map(photo => `
-                    <div class="photo-item" onclick="maintenanceSystem.viewImage('${photo.data}')">
+                previewEl.innerHTML = photosArray.map(photo => `
+                    <div class="photo-item" onclick="window.maintenanceSystem && window.maintenanceSystem.viewImage('${photo.data}')">
                         <img src="${photo.data}" alt="Foto ${photo.timestamp}">
-                        <button class="remove-btn" onclick="event.stopPropagation(); maintenanceSystem.${methodName}(${photo.id})">&times;</button>
+                        <button class="remove-btn" onclick="event.stopPropagation(); window.maintenanceSystem && window.maintenanceSystem.${removeMethodName}(${photo.id})">&times;</button>
                     </div>
                 `).join('');
+                this.log(`Preview de fotos ${isFinalize ? 'de finalização' : 'iniciais'} atualizado com ${photosArray.length} fotos.`);
             }
 
             removePhoto(photoId) {
                 this.photos = this.photos.filter(photo => photo.id !== photoId);
-                this.updatePhotosPreview();
-                this.showStatus('formStatus', 'Foto removida!', 'info');
+                this.updatePhotosPreview(false); // false para fotos iniciais
+                this.showStatus(this.domIds.formStatus, 'Foto inicial removida!', 'info');
+                this.log(`Foto inicial ID ${photoId} removida.`);
             }
 
             removePhotoFinalize(photoId) {
                 this.photosFinalize = this.photosFinalize.filter(photo => photo.id !== photoId);
-                this.updatePhotosPreview(true);
+                this.updatePhotosPreview(true); // true para fotos de finalização
+                // Não precisa de showStatus aqui, pois é dentro de um modal
+                this.log(`Foto de finalização ID ${photoId} removida.`);
             }
 
             viewImage(imageSrc) {
-                document.getElementById('viewerImage').src = imageSrc;
-                document.getElementById('imageViewer').classList.remove('hidden');
+                const viewerImageEl = document.getElementById(this.domIds.viewerImage);
+                const imageViewerEl = document.getElementById(this.domIds.imageViewer);
+
+                if (viewerImageEl && imageViewerEl) {
+                    viewerImageEl.src = imageSrc;
+                    imageViewerEl.classList.remove('hidden');
+                    this.log('Visualizador de imagem aberto.');
+                } else {
+                    this.log("Elementos do visualizador de imagem não encontrados.", "warn");
+                }
             }
 
             closeImageViewer() {
-                document.getElementById('imageViewer').classList.add('hidden');
+                const imageViewerEl = document.getElementById(this.domIds.imageViewer);
+                if (imageViewerEl) {
+                    imageViewerEl.classList.add('hidden');
+                    this.log('Visualizador de imagem fechado.');
+                }
             }
 
             generateRecordId() {
@@ -1649,239 +1772,257 @@
                 const year = now.getFullYear().toString().slice(-2);
                 const month = (now.getMonth() + 1).toString().padStart(2, '0');
                 const day = now.getDate().toString().padStart(2, '0');
-                const time = now.getTime().toString().slice(-6);
-                return `GPS${year}${month}${day}${time}`;
+                // Usar milissegundos para maior unicidade em rajadas de criação
+                const millis = now.getMilliseconds().toString().padStart(3,'0');
+                const time = now.toTimeString().slice(0,8).replace(/:/g,''); // HHMMSS
+                return `GPS${year}${month}${day}${time}${millis}`;
             }
 
             async submitForm(e) {
                 e.preventDefault();
+                this.log('Formulário de novo registro submetido.');
                 
-                const formData = new FormData(e.target);
+                const form = e.target;
+                if (!(form instanceof HTMLFormElement)) {
+                    this.log('Evento de submit não originado de um formulário.', 'error');
+                    return;
+                }
+                const formData = new FormData(form);
                 const recordId = this.generateRecordId();
                 
                 const record = {
                     id: recordId,
                     responsavel: formData.get('responsavel') || '',
-                    placa: formData.get('placa') || '',
+                    placa: (formData.get('placa') || '').toUpperCase(),
                     tipoEquipamento: formData.get('tipoEquipamento') || '',
-                    dataRegistro: formData.get('dataRegistro') || '',
+                    dataRegistro: formData.get('dataRegistro') || new Date().toISOString().split('T')[0],
                     problema: formData.get('problema') || '',
                     horaProblema: formData.get('horaProblema') || '',
                     horaComunicacao: formData.get('horaComunicacao') || '',
-                    dataHoraLiberacao: '',
+                    dataHoraLiberacao: '', // Estes são preenchidos na finalização
                     descricao: '',
                     aprovacao: '',
-                    status: 'Aberto',
-                    fotos: this.photos.length,
-                    fotosFinalizacao: 0,
+                    status: 'Aberto', // Status inicial
+                    fotos: this.photos.length, // Contagem de fotos iniciais
+                    fotosFinalizacao: 0, // Contagem de fotos de finalização (inicialmente 0)
                     tempoManutencao: '',
                     timestamp: new Date().toISOString()
                 };
 
+                this.log(`Novo registro preparado com ID: ${recordId}. Dados: ${JSON.stringify(record).substring(0,150)}...`);
+
                 try {
-                    // Always save to localStorage first (immediate backup)
-                    this.saveToLocalStorage(record);
-                    
-                    // Try to save to Google Sheets if URL is available
-                    if (this.googleScriptUrl && this.connectionTested) {
-                        try {
-                            await this.saveToGoogleSheets(record);
-                            this.showStatus('formStatus', `Registro ${recordId} salvo no Google Sheets!`, 'success');
-                        } catch (error) {
-                            this.log('Erro ao salvar no Google Sheets: ' + error.message, 'error');
-                            this.showStatus('formStatus', `Registro ${recordId} salvo localmente! (Erro na sincronização)`, 'success');
-                        }
-                    } else {
-                        this.showStatus('formStatus', `Registro ${recordId} salvo localmente!`, 'success');
-                    }
-                    
-                    // Update counts
+                    this.saveToLocalStorage(record); // Salva dados e fotos (this.photos)
                     this.updateCounts();
                     
-                    // Reset form
-                    setTimeout(() => {
-                        this.resetForm();
-                    }, 2000);
+                    if (this.googleScriptUrl && this.connectionTested) {
+                        this.log(`Tentando salvar registro ${recordId} no Google Sheets...`);
+                        // this.photos e this.photosFinalize (que estará vazio aqui) são usados por saveToGoogleSheets
+                        await this.saveToGoogleSheets(record); 
+                        this.showStatus(this.domIds.formStatus, `Registro ${recordId} salvo localmente e sincronizado com Google Sheets!`, 'success');
+                    } else if (this.googleScriptUrl && !this.connectionTested) {
+                        this.showStatus(this.domIds.formStatus, `Registro ${recordId} salvo localmente! (Falha na conexão com Google Sheets, tente sincronizar mais tarde)`, 'success');
+                         this.log(`Registro ${recordId} salvo localmente. Sincronização pendente devido à falha de conexão.`, 'warn');
+                    } else {
+                        this.showStatus(this.domIds.formStatus, `Registro ${recordId} salvo localmente! (Google Sheets não configurado)`, 'success');
+                        this.log(`Registro ${recordId} salvo localmente. URL do Google Sheets não configurada.`, 'info');
+                    }
+                    
+                    setTimeout(() => { this.resetForm(); }, 2000); // Resetar após feedback
                     
                 } catch (error) {
-                    this.log('Erro ao salvar registro: ' + error.message, 'error');
-                    this.showStatus('formStatus', 'Erro ao salvar registro.', 'error');
+                    this.log('Erro ao salvar registro (submitForm): ' + error.message, 'error', error);
+                    this.showStatus(this.domIds.formStatus, `Erro ao salvar registro ${recordId}. Verifique o console.`, 'error');
                 }
             }
 
             saveToLocalStorage(record) {
-                const existingRecords = JSON.parse(localStorage.getItem('maintenanceRecords') || '[]');
-                
-                // Check if updating existing record
-                const existingIndex = existingRecords.findIndex(r => r.id === record.id);
-                if (existingIndex !== -1) {
-                    existingRecords[existingIndex] = record;
-                } else {
-                    existingRecords.push(record);
+                try {
+                    const existingRecords = JSON.parse(localStorage.getItem('maintenanceRecords') || '[]');
+                    const existingIndex = existingRecords.findIndex(r => r.id === record.id);
+                    
+                    if (existingIndex !== -1) {
+                        existingRecords[existingIndex] = record; // Atualiza
+                        this.log(`Registro ${record.id} atualizado no localStorage.`);
+                    } else {
+                        existingRecords.push(record); // Adiciona novo
+                        this.log(`Novo registro ${record.id} adicionado ao localStorage.`);
+                    }
+                    localStorage.setItem('maintenanceRecords', JSON.stringify(existingRecords));
+                    
+                    // Salvar fotos atuais (this.photos) se for um novo registro ou se houver fotos
+                    // Se for uma atualização de um registro já finalizado, não sobrescrever fotos iniciais
+                    // a menos que seja intencional. Aqui, this.photos refere-se às fotos do formulário 'novo'.
+                    if (this.photos.length > 0 && record.status === 'Aberto') { // Só salva fotos se o registro estiver sendo criado (Aberto)
+                         localStorage.setItem(`photos_${record.id}`, JSON.stringify(this.photos));
+                         this.log(`${this.photos.length} fotos iniciais para ${record.id} salvas no localStorage.`);
+                    }
+
+                    // Se for uma finalização, this.photosFinalize terá dados e deve ser salvo
+                    if (this.photosFinalize && this.photosFinalize.length > 0 && record.status === 'Concluído') {
+                        localStorage.setItem(`photos_finalize_${record.id}`, JSON.stringify(this.photosFinalize));
+                        this.log(`${this.photosFinalize.length} fotos de finalização para ${record.id} salvas no localStorage.`);
+                    }
+
+                } catch (error) {
+                    this.log(`Erro ao salvar ${record.id} no localStorage: ${error.message}`, 'error', error);
+                    // Considerar um status de erro na UI aqui também.
                 }
-                
-                localStorage.setItem('maintenanceRecords', JSON.stringify(existingRecords));
-                
-                // Save photos separately
-                if (this.photos.length > 0) {
-                    localStorage.setItem(`photos_${record.id}`, JSON.stringify(this.photos));
-                }
-                
-                if (this.photosFinalize && this.photosFinalize.length > 0) {
-                    localStorage.setItem(`photos_finalize_${record.id}`, JSON.stringify(this.photosFinalize));
-                }
-                
-                this.log(`Registro ${record.id} salvo no localStorage`, 'success');
             }
 
-            async saveToGoogleSheets(record) {
+            async saveToGoogleSheets(recordData) { // recordData é o objeto do registro
                 if (!this.googleScriptUrl) {
+                    this.log('URL do Google Apps Script não configurada. Impossível salvar no Sheets.', 'error');
                     throw new Error('URL do Google Apps Script não configurada');
                 }
 
-                // Preparar dados para envio
+                // Preparar dados para envio. Inclui as fotos atuais em this.photos e this.photosFinalize.
+                // Se for um novo registro, this.photosFinalize estará vazio.
+                // Se for uma finalização, this.photosFinalize terá dados. this.photos pode ou não ter, dependendo do fluxo.
                 const dataToSend = {
-                    ...record,
-                    fotos: this.photos.map(photo => photo.data), // Enviar dados das fotos
-                    fotosFinalizacaoData: this.photosFinalize.map(photo => photo.data) // Fotos de finalização
+                    ...recordData, // Contém contagens de fotos e outros metadados
+                    fotos: recordData.status === 'Aberto' ? this.photos.map(photo => photo.data) : [], // Enviar fotos iniciais só se for novo
+                    fotosFinalizacaoData: recordData.status === 'Concluído' ? this.photosFinalize.map(photo => photo.data) : [] // Enviar fotos de finalização só se concluído
                 };
+                
+                // Se for um registro de teste de diagnóstico, a flag `teste:true` já está em recordData
+                // E `fotos` e `fotosFinalizacaoData` devem estar vazias ou com dados de teste seguros.
 
+                this.log(`Enviando dados para Google Sheets para ID ${recordData.id}. Flag de teste: ${!!recordData.teste}`);
                 try {
-                    this.log('Enviando dados para Google Sheets...', 'info');
-                    
                     const response = await fetch(this.googleScriptUrl, {
                         method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
+                        headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(dataToSend),
                         mode: 'cors'
                     });
 
-                    this.log(`Resposta recebida - Status: ${response.status}`, 'info');
+                    this.log(`Resposta do Google Sheets - Status: ${response.status} para ID ${recordData.id}`);
 
                     if (!response.ok) {
-                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                        const errorText = await response.text();
+                        this.log(`Erro HTTP ${response.status} do Google Sheets: ${errorText}`, 'error');
+                        throw new Error(`Erro do servidor Google Sheets (HTTP ${response.status}): ${response.statusText}. Detalhes: ${errorText.substring(0,200)}`);
                     }
 
                     const responseData = await response.json();
-                    this.log('Dados salvos no Google Sheets: ' + JSON.stringify(responseData), 'success');
+                    this.log(`Resposta JSON do Google Sheets para ${recordData.id}: ${JSON.stringify(responseData).substring(0,200)}...`, 'success');
                     
                     if (!responseData.success) {
-                        throw new Error(responseData.message || 'Erro desconhecido do servidor');
+                        this.log(`Google Sheets retornou success:false para ${recordData.id}. Mensagem: ${responseData.message}`, 'error');
+                        throw new Error(responseData.message || 'Erro desconhecido retornado pelo servidor Google Sheets.');
+                    }
+                    
+                    // Se for um registro de teste de diagnóstico, o backend deve retornar `testMode: true`
+                    if (recordData.teste && !responseData.testMode) {
+                        this.log(`Registro de teste enviado, mas resposta do servidor não incluiu 'testMode:true'.`, 'warn');
                     }
 
-                    return responseData;
+                    return responseData; // Retornar a resposta completa do Apps Script
 
                 } catch (error) {
-                    this.log('Erro ao salvar no Google Sheets: ' + error.message, 'error');
-                    throw error;
+                    this.log(`Erro CRÍTICO ao salvar no Google Sheets para ${recordData.id}: ${error.message}`, 'error', error);
+                    throw error; // Re-lançar para que o chamador (submitForm, runDiagnostics) possa tratar
                 }
             }
 
             loadRecords() {
                 try {
                     this.records = JSON.parse(localStorage.getItem('maintenanceRecords') || '[]');
-                    this.filteredRecords = [...this.records];
+                    this.filteredRecords = [...this.records]; // Começa com todos os registros
                     this.displayRecords();
-                    this.log(`${this.records.length} registros carregados do localStorage`, 'success');
+                    this.log(`${this.records.length} registros carregados do localStorage e exibidos.`);
                 } catch (error) {
-                    this.log('Erro ao carregar registros: ' + error.message, 'error');
-                    document.getElementById('recordsList').innerHTML = 
-                        '<div class="status error">Erro ao carregar registros.</div>';
+                    this.log('Erro ao carregar registros do localStorage: ' + error.message, 'error', error);
+                    const recordsListEl = document.getElementById(this.domIds.recordsList);
+                    if (recordsListEl) {
+                        recordsListEl.innerHTML = '<div class="status error">Erro ao carregar registros locais. Verifique o console.</div>';
+                    }
                 }
             }
 
             searchRecords() {
-                const searchId = document.getElementById('searchId').value.toUpperCase();
-                const searchDate = document.getElementById('searchDate').value;
-                const searchPlaca = document.getElementById('searchPlaca').value.toUpperCase();
-                const searchEquipamento = document.getElementById('searchEquipamento').value;
-                const searchStatus = document.getElementById('searchStatus').value;
-                const searchResponsavel = document.getElementById('searchResponsavel').value.toLowerCase();
+                const searchId = (document.getElementById(this.domIds.searchId)?.value || '').toUpperCase();
+                const searchDate = document.getElementById(this.domIds.searchDate)?.value || '';
+                const searchPlaca = (document.getElementById(this.domIds.searchPlaca)?.value || '').toUpperCase();
+                const searchEquipamento = document.getElementById(this.domIds.searchEquipamento)?.value || '';
+                const searchStatus = document.getElementById(this.domIds.searchStatus)?.value || '';
+                const searchResponsavel = (document.getElementById(this.domIds.searchResponsavel)?.value || '').toLowerCase();
+                this.log(`Iniciando busca com critérios: ID(${searchId}), Data(${searchDate}), Placa(${searchPlaca}), Equip(${searchEquipamento}), Status(${searchStatus}), Resp(${searchResponsavel})`);
 
                 this.filteredRecords = this.records.filter(record => {
                     let matches = true;
-                    
-                    if (searchId && !record.id.includes(searchId)) {
-                        matches = false;
-                    }
-                    
-                    if (searchDate && record.dataRegistro !== searchDate) {
-                        matches = false;
-                    }
-                    
-                    if (searchPlaca && !record.placa.includes(searchPlaca)) {
-                        matches = false;
-                    }
-                    
-                    if (searchEquipamento && record.tipoEquipamento !== searchEquipamento) {
-                        matches = false;
-                    }
-                    
-                    if (searchStatus && record.status !== searchStatus) {
-                        matches = false;
-                    }
-                    
-                    if (searchResponsavel && !record.responsavel.toLowerCase().includes(searchResponsavel)) {
-                        matches = false;
-                    }
-                    
+                    if (searchId && !(record.id || '').toUpperCase().includes(searchId)) matches = false;
+                    if (searchDate && record.dataRegistro !== searchDate) matches = false;
+                    if (searchPlaca && !(record.placa || '').toUpperCase().includes(searchPlaca)) matches = false;
+                    if (searchEquipamento && record.tipoEquipamento !== searchEquipamento) matches = false;
+                    if (searchStatus && record.status !== searchStatus) matches = false;
+                    if (searchResponsavel && !(record.responsavel || '').toLowerCase().includes(searchResponsavel)) matches = false;
                     return matches;
                 });
 
                 this.displayRecords();
-                this.log(`Busca realizada: ${this.filteredRecords.length} registros encontrados`, 'info');
+                this.log(`Busca concluída: ${this.filteredRecords.length} de ${this.records.length} registros encontrados.`);
             }
 
             clearSearch() {
-                document.getElementById('searchId').value = '';
-                document.getElementById('searchDate').value = '';
-                document.getElementById('searchPlaca').value = '';
-                document.getElementById('searchEquipamento').value = '';
-                document.getElementById('searchStatus').value = '';
-                document.getElementById('searchResponsavel').value = '';
+                const fieldsToClear = [this.domIds.searchId, this.domIds.searchDate, this.domIds.searchPlaca, this.domIds.searchEquipamento, this.domIds.searchStatus, this.domIds.searchResponsavel];
+                fieldsToClear.forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.value = '';
+                });
                 this.filteredRecords = [...this.records];
                 this.displayRecords();
+                this.log('Filtros de busca limpos.');
             }
 
             displayRecords() {
-                const container = document.getElementById('recordsList');
+                const container = document.getElementById(this.domIds.recordsList);
+                if (!container) {
+                    this.log("Elemento 'recordsList' não encontrado para exibir registros.", "error");
+                    return;
+                }
                 
                 if (this.filteredRecords.length === 0) {
                     container.innerHTML = `
                         <div class="no-records">
                             Nenhum registro encontrado.<br>
-                            ${this.records.length === 0 ? 'Crie seu primeiro registro na aba "Novo".' : 'Tente ajustar os filtros de busca.'}
+                            ${this.records.length === 0 ? 'Crie seu primeiro registro na aba "Novo".' : 'Tente ajustar os filtros de busca ou limpar a busca.'}
                         </div>
                     `;
                     return;
                 }
 
-                const sortedRecords = this.filteredRecords.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+                // Ordenar por timestamp (mais recente primeiro)
+                const sortedRecords = [...this.filteredRecords].sort((a, b) => {
+                    const dateA = new Date(a.timestamp || 0);
+                    const dateB = new Date(b.timestamp || 0);
+                    return dateB - dateA;
+                });
                 
                 container.innerHTML = sortedRecords.map(record => {
                     const recordText = this.generateFormattedRecordText(record);
-                    const statusClass = this.getStatusClass(record);
+                    const statusClass = this.getStatusClass(record); // pending, completed, approved, rejected
+                    const statusText = this.getStatusText(record);   // Em Aberto, Concluído, Aprovada, Reprovada
                     
                     return `
                         <div class="record-item ${statusClass}">
                             <div class="record-header">
                                 <span class="record-id">#${record.id}</span>
                                 <span class="record-status status-${statusClass}">
-                                    ${this.getStatusText(record)}
+                                    ${statusText}
                                 </span>
                             </div>
-                            <div class="record-details">${recordText}</div>
+                            <div class="record-details">${recordText.replace(/\n/g, '<br>')}</div>
                             <div class="record-actions">
-                                <button class="btn btn-small btn-info" onclick="maintenanceSystem.copyRecordText('${record.id}')">
-                                    Copiar
+                                <button class="btn btn-small btn-info" onclick="window.maintenanceSystem && window.maintenanceSystem.copyRecordText('${record.id}')">
+                                    Copiar Texto
                                 </button>
-                                <button class="btn btn-small btn-warning" onclick="maintenanceSystem.generateSingleReport('${record.id}')">
-                                    PDF
+                                <button class="btn btn-small btn-warning" onclick="window.maintenanceSystem && window.maintenanceSystem.generateSingleReport('${record.id}')">
+                                    Gerar PDF
                                 </button>
-                                <button class="btn btn-small btn-success" onclick="maintenanceSystem.openFinalizeModal('${record.id}')">
-                                    ${record.status === 'Aberto' ? 'Finalizar' : 'Editar'}
+                                <button class="btn btn-small btn-success" onclick="window.maintenanceSystem && window.maintenanceSystem.openFinalizeModal('${record.id}')">
+                                    ${record.status === 'Aberto' ? 'Finalizar Manutenção' : 'Ver/Editar Finalização'}
                                 </button>
                             </div>
                         </div>
@@ -1891,533 +2032,721 @@
 
             generateFormattedRecordText(record) {
                 const status = this.getStatusText(record);
-                const dataFormatada = record.dataRegistro ? new Date(record.dataRegistro).toLocaleDateString('pt-BR') : 'Não informado';
-                const agora = new Date().toLocaleString('pt-BR');
+                // Formatar dataRegistro para dd/mm/yyyy
+                let dataFormatada = 'Não informado';
+                if (record.dataRegistro) {
+                    const parts = record.dataRegistro.split('-'); // YYYY-MM-DD
+                    if (parts.length === 3) {
+                        dataFormatada = `${parts[2]}/${parts[1]}/${parts[0]}`;
+                    } else {
+                        // Tentar formatar se for um objeto Date ou timestamp ISO
+                        try { dataFormatada = new Date(record.dataRegistro).toLocaleDateString('pt-BR'); }
+                        catch(e) { /* manter 'Não informado' */ }
+                    }
+                }
+                
+                const agora = new Date().toLocaleString('pt-BR', {day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'});
                 
                 let texto = `══════════════════════════
 REGISTRO DE MANUTENÇÃO - ${status.toUpperCase()}
 ══════════════════════════
 📋 IDENTIFICAÇÃO
-ID: ${record.id}
-Responsável: ${record.responsavel || 'Não informado'}
-Placa/Identificação: ${record.placa || 'Não informado'}
-Tipo de Equipamento: ${record.tipoEquipamento || 'Não informado'}
+ID do Registro: ${record.id || 'N/D'}
+Responsável pelo Relatório: ${record.responsavel || 'N/D'}
+Placa/Identificação do Equip.: ${record.placa || 'N/D'}
+Tipo de Equipamento: ${record.tipoEquipamento || 'N/D'}
 
 ⚠️ PROBLEMA REPORTADO
-Data de Registro: ${dataFormatada}
-Hora do Problema: ${record.horaProblema || 'Não informado'}
-Hora de Comunicação: ${record.horaComunicacao || 'Não informado'}
-Descrição: ${record.problema || 'Não informado'}
+Data do Registro: ${dataFormatada}
+Hora do Problema: ${record.horaProblema || 'N/D'}
+Hora de Comunicação (Servitec): ${record.horaComunicacao || 'N/D'}
+Descrição do Problema: ${record.problema || 'N/D'}
 
-📸 DOCUMENTAÇÃO
-Fotos Iniciais: ${record.fotos || 0}`;
+📸 DOCUMENTAÇÃO INICIAL
+Total de Fotos Iniciais: ${record.fotos || 0}`;
 
                 if (record.status === 'Concluído') {
+                    let dataHoraLibFormatada = 'N/D';
+                    if (record.dataHoraLiberacao) {
+                        try { dataHoraLibFormatada = new Date(record.dataHoraLiberacao).toLocaleString('pt-BR', {day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'}); }
+                        catch(e) { /* manter 'N/D' */ }
+                    }
+
                     texto += `
 
-✅ FINALIZAÇÃO
-Data/Hora de Liberação: ${record.dataHoraLiberacao ? new Date(record.dataHoraLiberacao).toLocaleString('pt-BR') : 'Não informado'}
-Tempo de Manutenção: ${record.tempoManutencao || 'Não calculado'}
-Status da Manutenção: ${record.aprovacao || 'Não informado'}
-Fotos de Finalização: ${record.fotosFinalizacao || 0}`;
+✅ FINALIZAÇÃO DA MANUTENÇÃO
+Data/Hora de Liberação do Equip.: ${dataHoraLibFormatada}
+Tempo Total de Manutenção: ${record.tempoManutencao || 'Não calculado'}
+Status da Manutenção (Servitec): ${record.aprovacao || 'Não informado'}
+Total de Fotos de Finalização: ${record.fotosFinalizacao || 0}`;
 
-                    if (record.descricao) {
+                    if (record.descricao && record.descricao.trim() !== '') {
                         texto += `
-Observações: ${record.descricao}`;
+Observações da Finalização: ${record.descricao}`;
                     }
                 }
 
                 texto += `
 ══════════════════════════
-Status: ${status} | Sistema GrupoGPS
-Gerado em: ${agora}
+Status Atual: ${status} | Sistema GrupoGPS
+Texto gerado em: ${agora}
 ══════════════════════════`;
-
                 return texto;
             }
 
-            getStatusClass(record) {
+            getStatusClass(record) { // Retorna classe CSS para o item
                 if (record.aprovacao === 'Aprovada') return 'approved';
                 if (record.aprovacao === 'Reprovada') return 'rejected';
                 if (record.status === 'Concluído') return 'completed';
-                return 'pending';
+                return 'pending'; // Default para 'Aberto'
             }
 
-            getStatusText(record) {
-                if (record.aprovacao === 'Aprovada') return 'Aprovada';
-                if (record.aprovacao === 'Reprovada') return 'Reprovada';
-                if (record.status === 'Concluído') return 'Concluído';
-                return 'Em Aberto';
+            getStatusText(record) { // Retorna texto amigável do status
+                if (record.aprovacao === 'Aprovada') return 'Manutenção Aprovada';
+                if (record.aprovacao === 'Reprovada') return 'Manutenção Reprovada';
+                if (record.status === 'Concluído') return 'Manutenção Concluída';
+                return 'Manutenção Em Aberto';
             }
 
             copyRecordText(recordId) {
                 const record = this.records.find(r => r.id === recordId);
                 if (record) {
-                    const text = this.generateFormattedRecordText(record);
-                    navigator.clipboard.writeText(text).then(() => {
+                    const textToCopy = this.generateFormattedRecordText(record);
+                    navigator.clipboard.writeText(textToCopy).then(() => {
                         this.showCopyNotification();
-                        this.log('Texto copiado para área de transferência', 'success');
-                    }).catch(() => {
-                        // Fallback for older browsers
-                        const textArea = document.createElement('textarea');
-                        textArea.value = text;
-                        document.body.appendChild(textArea);
-                        textArea.select();
-                        document.execCommand('copy');
-                        document.body.removeChild(textArea);
-                        this.showCopyNotification();
-                        this.log('Texto copiado (fallback)', 'success');
+                        this.log(`Texto do registro ${recordId} copiado para área de transferência.`);
+                    }).catch(err => {
+                        this.log(`Falha ao copiar texto para ${recordId}: ${err.message}`, 'error', err);
+                        // Fallback para navegadores mais antigos (menos comum hoje em dia)
+                        try {
+                            const textArea = document.createElement('textarea');
+                            textArea.value = textToCopy;
+                            textArea.style.position = 'fixed'; textArea.style.opacity = '0'; // Esconder
+                            document.body.appendChild(textArea);
+                            textArea.select();
+                            document.execCommand('copy');
+                            document.body.removeChild(textArea);
+                            this.showCopyNotification();
+                            this.log(`Texto do registro ${recordId} copiado (fallback).`);
+                        } catch (fallbackError) {
+                            this.log(`Falha no fallback de cópia para ${recordId}: ${fallbackError.message}`, 'error', fallbackError);
+                            alert('Erro ao copiar. Seu navegador pode não suportar esta funcionalidade ou as permissões não foram concedidas.');
+                        }
                     });
+                } else {
+                    this.log(`Registro ${recordId} não encontrado para cópia.`, "warn");
                 }
             }
 
             showCopyNotification() {
-                const notification = document.getElementById('copyNotification');
-                notification.classList.add('show');
-                setTimeout(() => {
-                    notification.classList.remove('show');
-                }, 2000);
+                const notification = document.getElementById(this.domIds.copyNotification);
+                if (notification) {
+                    notification.classList.add('show');
+                    setTimeout(() => { notification.classList.remove('show'); }, 2500);
+                } else {
+                    this.log("Elemento 'copyNotification' não encontrado.", "warn");
+                }
             }
 
             openFinalizeModal(recordId) {
                 this.currentRecord = this.records.find(r => r.id === recordId);
-                if (!this.currentRecord) return;
+                if (!this.currentRecord) {
+                    this.log(`Registro ${recordId} não encontrado para finalizar/editar.`, "error");
+                    alert(`Erro: Registro com ID ${recordId} não encontrado.`);
+                    return;
+                }
+                this.log(`Abrindo modal de finalização para registro ${recordId}.`);
 
-                // Load existing finalization photos
-                const existingFinalizePhotos = localStorage.getItem(`photos_finalize_${recordId}`);
-                if (existingFinalizePhotos) {
-                    this.photosFinalize = JSON.parse(existingFinalizePhotos);
-                } else {
-                    this.photosFinalize = [];
+                const finalizeModalEl = document.getElementById(this.domIds.finalizeModal);
+                const finalizeContentEl = document.getElementById(this.domIds.finalizeContent);
+                const originalPhotosEl = document.getElementById(this.domIds.originalPhotos); // Este ID precisa existir no HTML do modal se quiser mostrar fotos originais
+
+                if (!finalizeModalEl || !finalizeContentEl) {
+                    this.log("Elementos do modal de finalização não encontrados.", "error");
+                    return;
                 }
 
-                // Populate modal with record data
-                const content = document.getElementById('finalizeContent');
-                content.innerHTML = `
-                    <div class="record-details">${this.generateFormattedRecordText(this.currentRecord)}</div>
-                    <div class="photos-preview" id="originalPhotos"></div>
+                // Carregar fotos de finalização existentes do localStorage
+                const existingFinalizePhotosStr = localStorage.getItem(`photos_finalize_${recordId}`);
+                if (existingFinalizePhotosStr) {
+                    try { this.photosFinalize = JSON.parse(existingFinalizePhotosStr); }
+                    catch (e) { this.photosFinalize = []; this.log(`Erro ao parsear fotos de finalização para ${recordId}: ${e.message}`, "warn");}
+                } else {
+                    this.photosFinalize = []; // Começa vazio se não houver
+                }
+
+                // Popular modal com dados do registro
+                finalizeContentEl.innerHTML = `
+                    <h4>Detalhes do Registro Original:</h4>
+                    <div class="record-details" style="max-height: 150px; overflow-y: auto; margin-bottom: 15px;">
+                        ${this.generateFormattedRecordText(this.currentRecord).replace(/\n/g, '<br>')}
+                    </div>
+                    <div id="${this.domIds.originalPhotos}"></div> <!-- Placeholder para fotos originais -->
                 `;
 
-                // Load original photos
-                const originalPhotos = localStorage.getItem(`photos_${recordId}`);
-                if (originalPhotos) {
-                    const photos = JSON.parse(originalPhotos);
-                    document.getElementById('originalPhotos').innerHTML = `
-                        <h4>Fotos Originais:</h4>
-                        ${photos.map(photo => `
-                            <div class="photo-item" onclick="maintenanceSystem.viewImage('${photo.data}')">
-                                <img src="${photo.data}" alt="Foto original">
-                            </div>
-                        `).join('')}
-                    `;
+                // Carregar e exibir fotos originais (se existirem)
+                if (originalPhotosEl || document.getElementById(this.domIds.originalPhotos)) { // Verificar se o placeholder existe
+                    const originalPhotosStr = localStorage.getItem(`photos_${recordId}`);
+                    const targetOriginalPhotosDiv = document.getElementById(this.domIds.originalPhotos); // Pega o div recém-criado
+                    if (targetOriginalPhotosDiv && originalPhotosStr) {
+                        try {
+                            const photos = JSON.parse(originalPhotosStr);
+                            if (photos.length > 0) {
+                                targetOriginalPhotosDiv.innerHTML = `
+                                    <h5>Fotos Originais do Problema (${photos.length}):</h5>
+                                    <div class="photos-preview" style="max-height: 120px; overflow-y: auto;">
+                                        ${photos.map(photo => `
+                                            <div class="photo-item" onclick="window.maintenanceSystem && window.maintenanceSystem.viewImage('${photo.data}')">
+                                                <img src="${photo.data}" alt="Foto original">
+                                            </div>
+                                        `).join('')}
+                                    </div>`;
+                            } else { targetOriginalPhotosDiv.innerHTML = '<p><small>Nenhuma foto original registrada.</small></p>';}
+                        } catch (e) { 
+                            targetOriginalPhotosDiv.innerHTML = '<p><small>Erro ao carregar fotos originais.</small></p>';
+                            this.log(`Erro ao parsear fotos originais para ${recordId}: ${e.message}`, "warn");
+                        }
+                    } else if (targetOriginalPhotosDiv) {
+                        targetOriginalPhotosDiv.innerHTML = '<p><small>Nenhuma foto original registrada.</small></p>';
+                    }
                 }
 
-                // Populate existing data
-                if (this.currentRecord.dataHoraLiberacao) {
-                    const date = new Date(this.currentRecord.dataHoraLiberacao);
-                    document.getElementById('dataHoraLiberacao').value = date.toISOString().slice(0, 16);
-                }
-                document.getElementById('aprovacao').value = this.currentRecord.aprovacao || '';
-                document.getElementById('descricaoFinalizacao').value = this.currentRecord.descricao || '';
+                // Popular campos do formulário de finalização com dados existentes
+                const dataHoraLibEl = document.getElementById(this.domIds.dataHoraLiberacao);
+                const aprovacaoEl = document.getElementById(this.domIds.aprovacao);
+                const descricaoFinalizacaoEl = document.getElementById(this.domIds.descricaoFinalizacao);
 
-                this.updatePhotosPreview(true);
-                this.calculateMaintenanceTime();
+                if (dataHoraLibEl && this.currentRecord.dataHoraLiberacao) {
+                    try {
+                        // Formatar para datetime-local (YYYY-MM-DDTHH:mm)
+                        const date = new Date(this.currentRecord.dataHoraLiberacao);
+                        const year = date.getFullYear();
+                        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+                        const day = date.getDate().toString().padStart(2, '0');
+                        const hours = date.getHours().toString().padStart(2, '0');
+                        const minutes = date.getMinutes().toString().padStart(2, '0');
+                        dataHoraLibEl.value = `${year}-${month}-${day}T${hours}:${minutes}`;
+                    } catch (e) { 
+                        this.log(`Erro ao formatar dataHoraLiberacao para ${recordId}: ${e.message}`, "warn");
+                        dataHoraLibEl.value = ''; // Limpar se houver erro
+                    }
+                } else if (dataHoraLibEl) { dataHoraLibEl.value = ''; } // Limpar se não houver valor
+
+                if (aprovacaoEl) aprovacaoEl.value = this.currentRecord.aprovacao || '';
+                if (descricaoFinalizacaoEl) descricaoFinalizacaoEl.value = this.currentRecord.descricao || '';
+
+                this.updatePhotosPreview(true); // Atualiza preview das fotos de finalização
+                this.calculateMaintenanceTime(); // Calcula e exibe o tempo com base nos dados
                 
-                document.getElementById('finalizeModal').classList.remove('hidden');
+                finalizeModalEl.classList.remove('hidden');
             }
 
             closeFinalizeModal() {
-                document.getElementById('finalizeModal').classList.add('hidden');
-                this.stopCamera(true);
+                const finalizeModalEl = document.getElementById(this.domIds.finalizeModal);
+                if (finalizeModalEl) finalizeModalEl.classList.add('hidden');
+                this.stopCamera(true); // Para a câmera de finalização se estiver ativa
                 this.currentRecord = null;
-                this.photosFinalize = [];
+                this.photosFinalize = []; // Limpa array de fotos de finalização temporárias
+                this.log('Modal de finalização fechado.');
             }
 
             calculateMaintenanceTime() {
-                if (!this.currentRecord) return;
+                if (!this.currentRecord) {
+                    this.log("currentRecord não definido para calcular tempo.", "warn");
+                    return;
+                }
+                const timeCalculationEl = document.getElementById(this.domIds.timeCalculation);
+                if (!timeCalculationEl) {
+                    this.log("Elemento 'timeCalculation' não encontrado.", "warn");
+                    return;
+                }
 
-                const comunicacao = this.currentRecord.horaComunicacao;
-                const dataRegistro = this.currentRecord.dataRegistro;
-                const liberacao = document.getElementById('dataHoraLiberacao').value;
+                const comunicacao = this.currentRecord.horaComunicacao; // HH:mm
+                const dataRegistro = this.currentRecord.dataRegistro;   // YYYY-MM-DD
+                const dataHoraLiberacaoEl = document.getElementById(this.domIds.dataHoraLiberacao);
+                const liberacaoStr = dataHoraLiberacaoEl ? dataHoraLiberacaoEl.value : null; // YYYY-MM-DDTHH:mm
 
-                if (!comunicacao || !dataRegistro || !liberacao) {
-                    document.getElementById('timeCalculation').innerHTML = 'Complete os horários para calcular o tempo de manutenção.';
+                if (!comunicacao || !dataRegistro || !liberacaoStr) {
+                    timeCalculationEl.innerHTML = '<small>Preencha Data/Hora de Liberação, Data de Registro e Hora de Comunicação para calcular.</small>';
                     return;
                 }
 
                 try {
-                    const startTime = new Date(`${dataRegistro}T${comunicacao}`);
-                    const endTime = new Date(liberacao);
+                    const startTime = new Date(`${dataRegistro}T${comunicacao}`); // Constrói data ISO
+                    const endTime = new Date(liberacaoStr);                 // datetime-local é diretamente compatível
+
+                    if (isNaN(startTime.getTime()) || isNaN(endTime.getTime())) {
+                        timeCalculationEl.innerHTML = '<small>Datas/horas inválidas para cálculo.</small>';
+                        this.log(`Datas inválidas para cálculo: Start(${startTime}), End(${endTime})`, "warn");
+                        return;
+                    }
                     
                     const diffMs = endTime - startTime;
+                    if (diffMs < 0) {
+                         timeCalculationEl.innerHTML = '<strong>Atenção:</strong> Data/Hora de liberação é anterior à Data/Hora de comunicação.';
+                         return;
+                    }
+
                     const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
                     const diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+                    const timeText = `${diffHours} hora(s) e ${diffMinutes} minuto(s)`;
                     
-                    const timeText = `${diffHours}h ${diffMinutes}min`;
-                    
-                    document.getElementById('timeCalculation').innerHTML = `
-                        <strong>Tempo de Manutenção Calculado:</strong> ${timeText}<br>
-                        <small>Início: ${startTime.toLocaleString('pt-BR')} | Fim: ${endTime.toLocaleString('pt-BR')}</small>
+                    timeCalculationEl.innerHTML = `
+                        <strong>Tempo Estimado de Manutenção:</strong> ${timeText}<br>
+                        <small>Início (Comunicação): ${startTime.toLocaleString('pt-BR')} | Fim (Liberação): ${endTime.toLocaleString('pt-BR')}</small>
                     `;
+                    this.currentRecord.tempoManutencao = timeText; // Atualiza no objeto currentRecord temporariamente
                 } catch (error) {
-                    document.getElementById('timeCalculation').innerHTML = 'Erro ao calcular tempo. Verifique os dados inseridos.';
+                    timeCalculationEl.innerHTML = '<small>Erro ao calcular tempo. Verifique os dados inseridos.</small>';
+                    this.log('Erro ao calcular tempo de manutenção: ' + error.message, 'error', error);
                 }
             }
 
-            saveFinalization() {
-                if (!this.currentRecord) return;
+            async saveFinalization() {
+                if (!this.currentRecord) {
+                    this.log("Nenhum registro atual para salvar finalização.", "error");
+                    alert("Erro: Nenhum registro selecionado para finalização.");
+                    return;
+                }
+                this.log(`Salvando finalização para registro ${this.currentRecord.id}.`);
 
-                const dataHoraLiberacao = document.getElementById('dataHoraLiberacao').value;
-                const aprovacao = document.getElementById('aprovacao').value;
-                const descricao = document.getElementById('descricaoFinalizacao').value;
+                const dataHoraLiberacaoEl = document.getElementById(this.domIds.dataHoraLiberacao);
+                const aprovacaoEl = document.getElementById(this.domIds.aprovacao);
+                const descricaoFinalizacaoEl = document.getElementById(this.domIds.descricaoFinalizacao);
 
-                // Calculate maintenance time
-                let tempoManutencao = '';
+                const dataHoraLiberacao = dataHoraLiberacaoEl ? dataHoraLiberacaoEl.value : '';
+                const aprovacao = aprovacaoEl ? aprovacaoEl.value : '';
+                const descricao = descricaoFinalizacaoEl ? descricaoFinalizacaoEl.value : '';
+
+                if (!dataHoraLiberacao) {
+                    alert("Por favor, informe a Data e Hora de Liberação.");
+                    dataHoraLiberacaoEl.focus();
+                    return;
+                }
+                if (!aprovacao) {
+                    alert("Por favor, selecione o Status da Manutenção (Aprovada/Reprovada).");
+                    aprovacaoEl.focus();
+                    return;
+                }
+
+                // Recalcular tempo de manutenção com os valores finais
+                let tempoManutencaoFinal = '';
                 if (dataHoraLiberacao && this.currentRecord.horaComunicacao && this.currentRecord.dataRegistro) {
                     try {
                         const startTime = new Date(`${this.currentRecord.dataRegistro}T${this.currentRecord.horaComunicacao}`);
                         const endTime = new Date(dataHoraLiberacao);
                         const diffMs = endTime - startTime;
-                        const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-                        const diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-                        tempoManutencao = `${diffHours}h ${diffMinutes}min`;
+                        if (diffMs >= 0) {
+                            const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+                            const diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+                            tempoManutencaoFinal = `${diffHours}h ${diffMinutes}min`;
+                        } else { tempoManutencaoFinal = "Erro no cálculo"; }
                     } catch (error) {
-                        this.log('Erro ao calcular tempo: ' + error.message, 'error');
+                        this.log('Erro ao calcular tempo final de manutenção: ' + error.message, 'warn', error);
+                        tempoManutencaoFinal = "Erro no cálculo";
                     }
                 }
 
-                // Update record
+                // Atualizar o objeto do registro atual
                 this.currentRecord.dataHoraLiberacao = dataHoraLiberacao;
                 this.currentRecord.aprovacao = aprovacao;
                 this.currentRecord.descricao = descricao;
-                this.currentRecord.fotosFinalizacao = this.photosFinalize.length;
-                this.currentRecord.tempoManutencao = tempoManutencao;
+                this.currentRecord.fotosFinalizacao = this.photosFinalize.length; // Contagem das fotos de finalização
+                this.currentRecord.tempoManutencao = tempoManutencaoFinal;
                 this.currentRecord.status = 'Concluído';
+                this.currentRecord.timestamp = new Date().toISOString(); // Atualizar timestamp para refletir a modificação
 
-                // Save to localStorage
-                this.saveToLocalStorage(this.currentRecord);
-                
-                // Try to save to Google Sheets
-                if (this.googleScriptUrl && this.connectionTested) {
-                    this.saveToGoogleSheets(this.currentRecord).catch(error => {
-                        this.log('Erro ao sincronizar finalização: ' + error.message, 'error');
-                    });
+                try {
+                    this.saveToLocalStorage(this.currentRecord); // Salva dados e fotos de finalização (this.photosFinalize)
+                    
+                    if (this.googleScriptUrl && this.connectionTested) {
+                        this.log(`Tentando sincronizar finalização de ${this.currentRecord.id} com Google Sheets...`);
+                        // this.photosFinalize será usado por saveToGoogleSheets
+                        // this.photos (iniciais) não devem ser reenviadas a menos que a lógica de saveToGoogleSheets permita isso
+                        // Para garantir, vamos limpar this.photos se não for para reenviar
+                        const originalInitialPhotos = [...this.photos]; // Salvar estado
+                        this.photos = []; // Não reenviar fotos iniciais ao finalizar
+
+                        await this.saveToGoogleSheets(this.currentRecord);
+
+                        this.photos = originalInitialPhotos; // Restaurar
+                        this.showStatus(this.domIds.formStatus, `Finalização do registro ${this.currentRecord.id} salva e sincronizada!`, 'success');
+                    } else {
+                        this.showStatus(this.domIds.formStatus, `Finalização do registro ${this.currentRecord.id} salva localmente! (Sincronização pendente ou Apps Script não configurado)`, 'success');
+                        this.log(`Finalização de ${this.currentRecord.id} salva localmente. Sincronização pendente.`, 'warn');
+                    }
+                    
+                    this.closeFinalizeModal();
+                    this.loadRecords(); // Atualiza a lista de registros
+                } catch (error) {
+                    this.log(`Erro ao salvar finalização de ${this.currentRecord.id}: ${error.message}`, 'error', error);
+                    alert(`Erro ao salvar finalização. Verifique o console.`);
                 }
-                
-                this.showStatus('formStatus', `Registro ${this.currentRecord.id} finalizado com sucesso!`, 'success');
-                this.closeFinalizeModal();
-                this.loadRecords();
             }
 
             async generateReport() {
-                const type = document.getElementById('reportType').value;
-                const period = document.getElementById('reportPeriod').value;
-                
-                let filteredRecords = [...this.records];
-                
-                // Filter by type
-                if (type === 'pending') {
-                    filteredRecords = filteredRecords.filter(r => r.status === 'Aberto');
-                } else if (type === 'completed') {
-                    filteredRecords = filteredRecords.filter(r => r.status === 'Concluído');
-                } else if (type === 'approved') {
-                    filteredRecords = filteredRecords.filter(r => r.aprovacao === 'Aprovada');
-                } else if (type === 'rejected') {
-                    filteredRecords = filteredRecords.filter(r => r.aprovacao === 'Reprovada');
+                const reportTypeEl = document.getElementById(this.domIds.reportType);
+                const reportPeriodEl = document.getElementById(this.domIds.reportPeriod);
+                if (!reportTypeEl || !reportPeriodEl) {
+                    this.log("Elementos de tipo/período de relatório não encontrados.", "error");
+                    this.showStatus(this.domIds.reportStatus, 'Erro interno: campos de relatório ausentes.', 'error');
+                    return;
                 }
+
+                const type = reportTypeEl.value;
+                const period = reportPeriodEl.value;
+                this.log(`Gerando relatório: Tipo(${type}), Período(${period})`);
                 
-                // Filter by period
+                let filteredRecordsForReport = [...this.records];
+                
+                if (type === 'pending') filteredRecordsForReport = filteredRecordsForReport.filter(r => r.status === 'Aberto' && (!r.aprovacao || r.aprovacao === ''));
+                else if (type === 'completed') filteredRecordsForReport = filteredRecordsForReport.filter(r => r.status === 'Concluído' && (!r.aprovacao || r.aprovacao === ''));
+                else if (type === 'approved') filteredRecordsForReport = filteredRecordsForReport.filter(r => r.aprovacao === 'Aprovada');
+                else if (type === 'rejected') filteredRecordsForReport = filteredRecordsForReport.filter(r => r.aprovacao === 'Reprovada');
+                // Adicionar filtro por tipo de equipamento se "by-equipment" for selecionado (precisaria de outro select para o tipo)
+
                 const now = new Date();
+                const todayMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
                 if (period === 'today') {
-                    const today = now.toISOString().split('T')[0];
-                    filteredRecords = filteredRecords.filter(r => r.dataRegistro === today);
+                    filteredRecordsForReport = filteredRecordsForReport.filter(r => new Date(r.dataRegistro).getTime() === todayMidnight.getTime());
                 } else if (period === 'week') {
-                    const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-                    filteredRecords = filteredRecords.filter(r => new Date(r.dataRegistro) >= weekAgo);
+                    const startOfWeek = new Date(todayMidnight);
+                    startOfWeek.setDate(todayMidnight.getDate() - todayMidnight.getDay()); // Domingo
+                    filteredRecordsForReport = filteredRecordsForReport.filter(r => new Date(r.dataRegistro) >= startOfWeek);
                 } else if (period === 'month') {
-                    const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
-                    filteredRecords = filteredRecords.filter(r => new Date(r.dataRegistro) >= monthAgo);
+                    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+                    filteredRecordsForReport = filteredRecordsForReport.filter(r => new Date(r.dataRegistro) >= startOfMonth);
                 }
                 
-                if (filteredRecords.length === 0) {
-                    this.showStatus('reportStatus', 'Nenhum registro encontrado para os filtros selecionados.', 'error');
+                if (filteredRecordsForReport.length === 0) {
+                    this.showStatus(this.domIds.reportStatus, 'Nenhum registro encontrado para os filtros selecionados.', 'info');
                     return;
                 }
                 
-                await this.generatePDFReport(filteredRecords, type);
+                await this.generatePDFReport(filteredRecordsForReport, `Relatorio_${type}_${period}`);
             }
 
             async generateSingleReport(recordId) {
                 const record = this.records.find(r => r.id === recordId);
                 if (record) {
-                    await this.generatePDFReport([record], 'single');
+                    this.log(`Gerando relatório PDF para registro único: ${recordId}`);
+                    await this.generatePDFReport([record], `Registro_${recordId}`);
+                } else {
+                    this.log(`Registro ${recordId} não encontrado para gerar PDF.`, "warn");
+                    this.showStatus(this.domIds.reportStatus, `Registro ${recordId} não encontrado.`, 'error');
                 }
             }
 
-            async generatePDFReport(records, type) {
+            async generatePDFReport(recordsToReport, reportTitleSuffix = 'Geral') {
+                if (!window.jspdf || !window.jspdf.jsPDF) {
+                    this.log("jsPDF não está carregado. Impossível gerar PDF.", "error");
+                    this.showStatus(this.domIds.reportStatus, 'Erro: Biblioteca PDF não carregada.', 'error');
+                    return;
+                }
+
+                this.showStatus(this.domIds.reportStatus, `Gerando PDF para ${recordsToReport.length} registro(s)...`, 'info');
                 try {
                     const { jsPDF } = window.jspdf;
-                    const pdf = new jsPDF();
+                    const pdf = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4' });
                     
                     const pageWidth = pdf.internal.pageSize.getWidth();
                     const pageHeight = pdf.internal.pageSize.getHeight();
-                    let currentY = 20;
+                    const margin = 15;
+                    let currentY = margin;
+                    const lineHeight = 5; // Aproximadamente para fonte 10pt
 
-                    // Header
-                    pdf.setFontSize(18);
-                    pdf.setFont(undefined, 'bold');
-                    pdf.text('GRUPOGPS', pageWidth / 2, currentY, { align: 'center' });
-                    currentY += 8;
-                    
-                    pdf.setFontSize(14);
-                    pdf.text('Sistema De Registro De Manutenção', pageWidth / 2, currentY, { align: 'center' });
-                    currentY += 15;
-                    
-                    pdf.setFontSize(10);
-                    pdf.setFont(undefined, 'normal');
-                    pdf.text(`Relatório gerado em: ${new Date().toLocaleString('pt-BR')}`, pageWidth / 2, currentY, { align: 'center' });
-                    currentY += 20;
-
-                    // Records
-                    for (const record of records) {
-                        if (currentY > pageHeight - 100) {
+                    const addPageIfNeeded = (spaceNeeded) => {
+                        if (currentY + spaceNeeded > pageHeight - margin) {
                             pdf.addPage();
-                            currentY = 20;
+                            currentY = margin;
+                            // Adicionar cabeçalho/rodapé em nova página se necessário
+                            pdf.setFontSize(8).text(`Página ${pdf.internal.getNumberOfPages()}`, pageWidth - margin, pageHeight - (margin/2), {align: 'right'});
                         }
+                    };
+                    
+                    // Cabeçalho Geral do Relatório
+                    pdf.setFontSize(18).setFont(undefined, 'bold');
+                    pdf.text('GRUPOGPS - Relatório de Manutenção', pageWidth / 2, currentY, { align: 'center' });
+                    currentY += 10;
+                    pdf.setFontSize(10).setFont(undefined, 'normal');
+                    pdf.text(`Gerado em: ${new Date().toLocaleString('pt-BR')}`, pageWidth / 2, currentY, { align: 'center' });
+                    currentY += 10;
+                    pdf.setLineWidth(0.5).line(margin, currentY, pageWidth - margin, currentY);
+                    currentY += 10;
+
+                    for (const record of recordsToReport) {
+                        addPageIfNeeded(80); // Estimar espaço para um registro
                         
-                        // Record content
                         const recordText = this.generateFormattedRecordText(record);
-                        const lines = recordText.split('\n');
+                        const lines = pdf.splitTextToSize(recordText, pageWidth - (2 * margin));
                         
-                        pdf.setFontSize(12);
-                        pdf.setFont(undefined, 'bold');
-                        pdf.text(`Registro: ${record.id}`, 20, currentY);
-                        currentY += 10;
+                        pdf.setFontSize(12).setFont(undefined, 'bold');
+                        pdf.text(`Registro ID: ${record.id}`, margin, currentY);
+                        currentY += lineHeight * 1.5;
                         
-                        pdf.setFontSize(10);
-                        pdf.setFont(undefined, 'normal');
-                        
+                        pdf.setFontSize(9).setFont(undefined, 'normal');
                         lines.forEach(line => {
-                            if (line.trim()) {
-                                const splitText = pdf.splitTextToSize(line, pageWidth - 40);
-                                pdf.text(splitText, 20, currentY);
-                                currentY += splitText.length * 4 + 2;
-                            }
+                            addPageIfNeeded(lineHeight);
+                            if (line.startsWith('═════')) pdf.setFont(undefined, 'bold');
+                            pdf.text(line, margin, currentY);
+                            if (line.startsWith('═════')) pdf.setFont(undefined, 'normal');
+                            currentY += lineHeight;
                         });
                         
-                        // Add photos
-                        await this.addPhotosToReport(pdf, record, currentY, pageWidth, pageHeight);
+                        // Adicionar fotos (simplificado, pode precisar de mais lógica de paginação)
+                        currentY = await this.addPhotosToReport(pdf, record, currentY, margin, pageWidth, pageHeight, addPageIfNeeded, lineHeight);
                         
-                        currentY = pdf.internal.getCurrentPageInfo().pageNumber > 1 ? 20 : currentY + 20;
+                        currentY += lineHeight * 2; // Espaço entre registros
+                        pdf.setLineWidth(0.2).line(margin, currentY, pageWidth - margin, currentY); // Separador
+                        currentY += lineHeight * 2;
                     }
                     
-                    // Save PDF
-                    const fileName = `GrupoGPS_Relatorio_${new Date().toISOString().split('T')[0]}_${Date.now()}.pdf`;
+                    // Rodapé final (última página)
+                    pdf.setFontSize(8).text(`Página ${pdf.internal.getNumberOfPages()}`, pageWidth - margin, pageHeight - (margin/2), {align: 'right'});
+
+                    const fileName = `GrupoGPS_Relatorio_${reportTitleSuffix}_${new Date().toISOString().split('T')[0]}.pdf`;
                     pdf.save(fileName);
                     
-                    this.showStatus('reportStatus', `Relatório gerado: ${fileName}`, 'success');
+                    this.showStatus(this.domIds.reportStatus, `Relatório PDF "${fileName}" gerado com ${recordsToReport.length} registros.`, 'success');
+                    this.log(`Relatório PDF "${fileName}" gerado.`);
                     
                 } catch (error) {
-                    this.log('Erro ao gerar relatório: ' + error.message, 'error');
-                    this.showStatus('reportStatus', 'Erro ao gerar relatório.', 'error');
+                    this.log('Erro ao gerar relatório PDF: ' + error.message, 'error', error);
+                    this.showStatus(this.domIds.reportStatus, 'Erro ao gerar relatório PDF. Verifique o console.', 'error');
                 }
             }
 
-            async addPhotosToReport(pdf, record, startY, pageWidth, pageHeight) {
+            async addPhotosToReport(pdf, record, startY, margin, pageWidth, pageHeight, addPageIfNeededFn, lineHeight) {
                 let currentY = startY;
-                
-                // Original photos
-                const originalPhotos = localStorage.getItem(`photos_${record.id}`);
-                if (originalPhotos) {
-                    try {
-                        const photos = JSON.parse(originalPhotos);
-                        if (photos.length > 0) {
-                            currentY += 10;
-                            pdf.setFont(undefined, 'bold');
-                            pdf.text('Fotos do Problema:', 20, currentY);
-                            currentY += 8;
-                            
-                            for (let i = 0; i < photos.length; i++) {
-                                if (currentY > pageHeight - 120) {
-                                    pdf.addPage();
-                                    currentY = 20;
-                                }
+                const photoMaxHeight = 50; // mm
+                const photoMaxWidth = (pageWidth - (2 * margin)) / 2 - 5; // Duas fotos por linha com espaço
+
+                const processPhotos = async (photosDataStr, typeLabel) => {
+                    if (photosDataStr) {
+                        try {
+                            const photos = JSON.parse(photosDataStr);
+                            if (photos.length > 0) {
+                                addPageIfNeededFn(lineHeight * 2 + photoMaxHeight);
+                                pdf.setFontSize(10).setFont(undefined, 'bold');
+                                pdf.text(`Fotos ${typeLabel} (${photos.length}):`, margin, currentY);
+                                currentY += lineHeight * 1.5;
                                 
-                                try {
-                                    const imgWidth = 100;
-                                    const imgHeight = 75;
-                                    pdf.addImage(photos[i].data, 'JPEG', 20, currentY, imgWidth, imgHeight);
+                                let currentX = margin;
+                                for (let i = 0; i < photos.length; i++) {
+                                    addPageIfNeededFn(photoMaxHeight + lineHeight); // Espaço para uma foto e legenda
+                                    try {
+                                        // Tentar adicionar imagem. Se falhar, pular para a próxima.
+                                        await new Promise((resolve, reject) => {
+                                            const img = new Image();
+                                            img.onload = () => {
+                                                const aspectRatio = img.width / img.height;
+                                                let imgWidth = photoMaxWidth;
+                                                let imgHeight = photoMaxWidth / aspectRatio;
+                                                if (imgHeight > photoMaxHeight) {
+                                                    imgHeight = photoMaxHeight;
+                                                    imgWidth = photoMaxHeight * aspectRatio;
+                                                }
+                                                pdf.addImage(photos[i].data, 'JPEG', currentX, currentY, imgWidth, imgHeight);
+                                                
+                                                pdf.setFontSize(7).setFont(undefined, 'italic');
+                                                pdf.text(`Foto ${i+1} (${typeLabel}) - ${photos[i].timestamp}`, currentX, currentY + imgHeight + 3);
+                                                resolve();
+                                            };
+                                            img.onerror = () => {
+                                                this.log(`Erro ao carregar imagem para PDF (Registro ${record.id}, Foto ${typeLabel} ${i+1})`, "warn");
+                                                pdf.setFontSize(7).setFont(undefined, 'italic');
+                                                pdf.text(`[Erro ao carregar foto ${i+1}]`, currentX, currentY + 10);
+                                                resolve(); // Resolve para não parar o PDF, mas registra o erro
+                                            };
+                                            img.src = photos[i].data;
+                                        });
+
+                                    } catch (imgError) {
+                                        this.log(`Erro CRÍTICO ao adicionar foto ao PDF (Registro ${record.id}): ${imgError.message}`, 'error', imgError);
+                                        pdf.setFontSize(7).setFont(undefined, 'italic');
+                                        pdf.text(`[Erro ao processar foto ${i+1}]`, currentX, currentY + 10);
+                                    }
                                     
-                                    pdf.setFontSize(8);
-                                    pdf.setFont(undefined, 'normal');
-                                    pdf.text(`Foto ${i + 1} - ${photos[i].timestamp}`, 20, currentY + imgHeight + 5);
-                                    
-                                    currentY += imgHeight + 15;
-                                } catch (imgError) {
-                                    this.log('Erro ao adicionar foto: ' + imgError.message, 'error');
+                                    // Mover para próxima posição de foto
+                                    if ((i + 1) % 2 === 0 || i === photos.length - 1) { // Nova linha após 2 fotos ou se for a última
+                                        currentY += photoMaxHeight + lineHeight * 2;
+                                        currentX = margin;
+                                    } else {
+                                        currentX += photoMaxWidth + 5; // Próxima coluna
+                                    }
                                 }
+                                currentY += lineHeight; // Espaço extra após bloco de fotos
                             }
+                        } catch (error) {
+                            this.log(`Erro ao processar string de fotos ${typeLabel} para PDF (Registro ${record.id}): ${error.message}`, 'error', error);
                         }
-                    } catch (error) {
-                        this.log('Erro ao processar fotos originais: ' + error.message, 'error');
                     }
-                }
-                
-                // Finalization photos
-                const finalizePhotos = localStorage.getItem(`photos_finalize_${record.id}`);
-                if (finalizePhotos) {
-                    try {
-                        const photos = JSON.parse(finalizePhotos);
-                        if (photos.length > 0) {
-                            currentY += 10;
-                            pdf.setFont(undefined, 'bold');
-                            pdf.text('Fotos da Finalização:', 20, currentY);
-                            currentY += 8;
-                            
-                            for (let i = 0; i < photos.length; i++) {
-                                if (currentY > pageHeight - 120) {
-                                    pdf.addPage();
-                                    currentY = 20;
-                                }
-                                
-                                try {
-                                    const imgWidth = 100;
-                                    const imgHeight = 75;
-                                    pdf.addImage(photos[i].data, 'JPEG', 20, currentY, imgWidth, imgHeight);
-                                    
-                                    pdf.setFontSize(8);
-                                    pdf.setFont(undefined, 'normal');
-                                    pdf.text(`Foto Finalização ${i + 1} - ${photos[i].timestamp}`, 20, currentY + imgHeight + 5);
-                                    
-                                    currentY += imgHeight + 15;
-                                } catch (imgError) {
-                                    this.log('Erro ao adicionar foto de finalização: ' + imgError.message, 'error');
-                                }
-                            }
-                        }
-                    } catch (error) {
-                        this.log('Erro ao processar fotos de finalização: ' + error.message, 'error');
-                    }
-                }
+                };
+
+                await processPhotos(localStorage.getItem(`photos_${record.id}`), 'do Problema');
+                await processPhotos(localStorage.getItem(`photos_finalize_${record.id}`), 'da Finalização');
                 
                 return currentY;
             }
 
             resetForm() {
-                document.getElementById('maintenanceForm').reset();
-                this.photos = [];
-                this.updatePhotosPreview();
-                this.stopCamera();
+                const form = document.getElementById(this.domIds.maintenanceForm);
+                if (form) form.reset();
+                else this.log("Formulário 'maintenanceForm' não encontrado para resetar.", "warn");
+
+                this.photos = []; // Limpa array de fotos iniciais
+                this.updatePhotosPreview(false); // Atualiza preview das fotos iniciais
+                this.stopCamera(false); // Para câmera inicial se estiver ativa
                 
-                // Reset default values
+                // Resetar valores padrão de data/hora
                 const now = new Date();
-                document.getElementById('dataRegistro').value = now.toISOString().split('T')[0];
-                document.getElementById('horaProblema').value = now.toTimeString().slice(0,5);
-                document.getElementById('horaComunicacao').value = now.toTimeString().slice(0,5);
+                const dataRegistroEl = document.getElementById(this.domIds.dataRegistro);
+                const horaProblemaEl = document.getElementById(this.domIds.horaProblema);
+                const horaComunicacaoEl = document.getElementById(this.domIds.horaComunicacao);
+
+                if (dataRegistroEl) dataRegistroEl.value = now.toISOString().split('T')[0];
+                if (horaProblemaEl) horaProblemaEl.value = now.toTimeString().slice(0,5);
+                if (horaComunicacaoEl) horaComunicacaoEl.value = now.toTimeString().slice(0,5);
                 
-                // Load cache data
-                this.loadCacheData();
+                this.loadCacheData(); // Recarrega dados de cache (ex: responsável)
+                this.log('Formulário de novo registro resetado.');
+                this.showStatus(this.domIds.formStatus, 'Formulário limpo.', 'info');
             }
 
             showStatus(elementId, message, type) {
                 const element = document.getElementById(elementId);
                 if (element) {
-                    element.className = `status ${type}`;
+                    element.className = `status ${type}`; // Adiciona classe de tipo (success, error, info)
                     element.textContent = message;
                     
-                    setTimeout(() => {
-                        element.textContent = '';
-                        element.className = '';
-                    }, 5000);
+                    // Limpar mensagem após um tempo, exceto se for erro persistente
+                    if (type !== 'error') { // Ou basear em uma flag de persistência
+                        setTimeout(() => {
+                            if (element.textContent === message) { // Só limpar se a mensagem não mudou
+                                element.textContent = '';
+                                element.className = 'status'; // Remove classe de tipo
+                            }
+                        }, 5000);
+                    }
+                } else {
+                    this.log(`Elemento de status '${elementId}' não encontrado para exibir mensagem: "${message}"`, "warn");
                 }
             }
-        }
+        } // Fim da classe MaintenanceSystem
+        console.log('Classe MaintenanceSystem definida.');
 
-        // Navigation functions
-        function showSection(sectionName) {
-            // Update nav buttons
-            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-            
-            // Update sections
-            document.querySelectorAll('.section').forEach(section => section.classList.remove('active'));
-            document.getElementById(sectionName).classList.add('active');
-            
-            // Load records when accessing records section
-            if (sectionName === 'registros') {
-                maintenanceSystem.loadRecords();
-            }
-            
-            // Update system stats when accessing configurations
-            if (sectionName === 'configuracoes') {
-                maintenanceSystem.updateConnectionStatus(!!maintenanceSystem.googleScriptUrl);
-                // Wait a bit for elements to load
-                setTimeout(() => {
-                    if (document.getElementById('localRecordsCount')) {
-                        maintenanceSystem.updateSystemStats();
-                    }
-                }, 100);
-            }
-        }
-
-        // Initialize system
-        let maintenanceSystem;
         document.addEventListener('DOMContentLoaded', () => {
-            console.log('Inicializando GrupoGPS...');
-            maintenanceSystem = new MaintenanceSystem();
-            
-            // Make available globally for debugging
-            window.maintenanceSystem = maintenanceSystem;
-            
-            console.log('GrupoGPS carregado com sucesso!');
+            console.log('[DOM] DOMContentLoaded disparado.');
+            try {
+                if (typeof MaintenanceSystem !== 'undefined') {
+                    window.maintenanceSystem = new MaintenanceSystem();
+                    console.log('[DOM] MaintenanceSystem instanciado e atribuído a window.maintenanceSystem.');
+                    
+                    // Se a primeira aba ativa ('novo') precisa de alguma inicialização específica
+                    // que depende do maintenanceSystem, poderia ser chamada aqui.
+                    // No entanto, 'novo' é a aba padrão e não parece precisar de setup especial
+                    // além do que o construtor/initializeSystem já faz.
+
+                    // Forçar a primeira aba a ser exibida corretamente, caso os botões sejam criados dinamicamente no futuro
+                    const activeButton = document.querySelector('.nav-btn.active');
+                    if (activeButton) {
+                        const activeSectionId = activeButton.getAttribute('onclick').match(/showSection\('([^']+)'/);
+                        if (activeSectionId && activeSectionId[1]) {
+                             showSection(activeSectionId[1], activeButton);
+                        }
+                    }
+
+                } else {
+                    console.error('[DOM] Classe MaintenanceSystem NÃO está definida no momento de DOMContentLoaded.');
+                    alert("Erro crítico: A classe principal do sistema não pôde ser carregada.");
+                }
+            } catch (error) {
+                console.error('[DOM] Erro FATAL durante a inicialização do MaintenanceSystem no DOMContentLoaded:', error, error.stack);
+                const systemStatusEl = document.getElementById('systemStatus'); // Usar this.domIds.systemStatus se a classe já estiver instanciada
+                if (systemStatusEl) {
+                    systemStatusEl.textContent = 'ERRO NA INICIALIZAÇÃO DO SISTEMA!';
+                    systemStatusEl.style.color = 'red';
+                    systemStatusEl.style.fontWeight = 'bold';
+                }
+                alert("Erro crítico ao iniciar o sistema. Verifique o console do navegador para detalhes.");
+            }
+            console.log('[DOM] Listener DOMContentLoaded concluído.');
         });
 
-        // Debug function for console testing
         window.testGrupoGPS = function() {
-            console.log('=== TESTE DO SISTEMA GRUPOGPS ===');
-            console.log('1. URL configurada:', maintenanceSystem.googleScriptUrl);
-            console.log('2. Conexão testada:', maintenanceSystem.connectionTested);
-            console.log('3. Último erro:', maintenanceSystem.lastConnectionError);
-            console.log('4. Registros locais:', maintenanceSystem.records.length);
-            console.log('5. Fotos locais:', Object.keys(localStorage).filter(k => k.startsWith('photos_')).length);
+            if (!window.maintenanceSystem) {
+                console.error("[TESTCON] window.maintenanceSystem não está definido. Teste não pode prosseguir.");
+                return "Erro: window.maintenanceSystem não definido.";
+            }
+            console.log('=== INICIANDO TESTE DO SISTEMA GRUPOGPS (via console) ===');
+            const ms = window.maintenanceSystem; // Atalho
+            console.log('1. URL Configurada:', ms.googleScriptUrl);
+            console.log('2. Conexão Testada Previamente:', ms.connectionTested);
+            console.log('3. Último Erro de Conexão:', ms.lastConnectionError || 'Nenhum');
+            console.log('4. Registros Locais (Carregados):', ms.records.length);
+            console.log('5. Conjuntos de Fotos Locais (localStorage):', Object.keys(localStorage).filter(k => k.startsWith('photos_')).length);
             
-            // Test data sending
             const testRecord = {
-                id: 'TEST_' + Date.now(),
-                responsavel: 'Teste Console',
-                placa: 'TEST-123',
-                tipoEquipamento: 'Alta Pressão',
-                dataRegistro: new Date().toISOString().split('T')[0],
-                problema: 'Teste de conexão via console',
-                horaProblema: '12:00',
-                horaComunicacao: '12:30',
-                status: 'Aberto',
-                fotos: 0,
-                timestamp: new Date().toISOString()
+                id: 'TEST_CONSOLE_' + Date.now(), responsavel: 'Teste Console', placa: 'TEST-CON',
+                tipoEquipamento: 'Alta Pressão', dataRegistro: new Date().toISOString().split('T')[0],
+                problema: 'Teste de salvamento e sincronização via console', horaProblema: '12:00', horaComunicacao: '12:30',
+                status: 'Aberto', fotos: 0, fotosFinalizacao: 0, timestamp: new Date().toISOString(),
+                teste: true // IMPORTANTE: Flag para o backend tratar como teste
             };
             
-            console.log('6. Enviando dados de teste...');
-            maintenanceSystem.saveToGoogleSheets(testRecord)
+            console.log('6. Preparando para enviar dados de teste (com flag "teste: true")...');
+            
+            // saveToGoogleSheets espera que this.photos e this.photosFinalize sejam arrays
+            // Para este teste, vamos garantir que estejam vazios se a intenção é não enviar fotos reais
+            const originalPhotosState = { photos: [...ms.photos], photosFinalize: [...ms.photosFinalize] };
+            ms.photos = []; 
+            ms.photosFinalize = [];
+
+            ms.saveToGoogleSheets(testRecord)
                 .then(result => {
-                    console.log('✅ Teste bem-sucedido:', result);
+                    console.log('✅ Teste de envio para Google Sheets (com flag "teste") BEM-SUCEDIDO:', result);
+                    if (result.testMode) {
+                        console.log("    potwierdzenie do modo de teste recebido do servidor.");
+                    } else {
+                        console.warn("   AVISO: Servidor não confirmou o modo de teste na resposta.");
+                    }
                 })
                 .catch(error => {
-                    console.log('❌ Teste falhou:', error.message);
+                    console.error('❌ Teste de envio para Google Sheets (com flag "teste") FALHOU:', error.message, error);
+                })
+                .finally(() => {
+                    // Restaurar estado original das fotos da instância, se necessário
+                    ms.photos = originalPhotosState.photos;
+                    ms.photosFinalize = originalPhotosState.photosFinalize;
+                    console.log('--- Teste via console finalizado. ---');
                 });
             
-            return 'Teste iniciado. Verifique os logs acima.';
+            return 'Teste de envio para Google Sheets iniciado (com flag "teste:true"). Verifique os logs no console.';
         };
 
-        // Error handler for debugging
         window.onerror = function(msg, url, lineNo, columnNo, error) {
-            if (maintenanceSystem && maintenanceSystem.debugMode) {
-                console.error('Erro global capturado:', {
-                    message: msg,
-                    source: url,
-                    line: lineNo,
-                    column: columnNo,
-                    error: error
-                });
+            const errorDetails = {
+                message: msg, source: url, line: lineNo, column: columnNo, errorObject: error 
+            };
+            console.error('[ERRO GLOBAL CAPTURADO]', errorDetails);
+            
+            if (window.maintenanceSystem && window.maintenanceSystem.debugMode) {
+                const diagnosticsResultsEl = document.getElementById(window.maintenanceSystem.domIds.diagnosticsResults);
+                if (diagnosticsResultsEl) {
+                    const errorDiv = document.createElement('div');
+                    errorDiv.className = 'debug-error'; // Usar classe de estilo existente
+                    errorDiv.innerHTML = `<strong>ERRO GLOBAL:</strong> ${msg}<br><small>Arquivo: ${url.substring(url.lastIndexOf('/')+1)} (Linha: ${lineNo}, Col: ${columnNo})</small>`;
+                    diagnosticsResultsEl.appendChild(errorDiv);
+                } else {
+                    // Se o painel de diagnóstico não estiver visível ou não existir, pode ser útil um alert para erros muito críticos
+                    // alert(`Erro crítico na aplicação: ${msg}`);
+                }
             }
-            return false;
+            // Retornar true suprimiria o erro no console padrão do navegador, geralmente queremos false.
+            return false; 
         };
+        console.log('Bloco de script principal e handlers globais configurados.');
+    </script>
+</body>
+</html>
