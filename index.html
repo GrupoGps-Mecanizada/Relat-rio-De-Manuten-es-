@@ -1935,7 +1935,7 @@
             }
 
             // SUBSTITUA a função saveToGoogleSheets() no seu index.html
-            // Encontre a função e substitua por esta versão:
+            // Encontre e substitua pela versão corrigida:
             
             async saveToGoogleSheets(recordData) {
                 if (!this.googleScriptUrl) {
@@ -1952,12 +1952,14 @@
                 this.log(`Enviando dados para Google Sheets para ID ${recordData.id}. Flag de teste: ${!!recordData.teste}`);
                 
                 try {
-                    // Tentar método fetch simples primeiro
+                    // CORREÇÃO: Adicionar headers Content-Type obrigatório
                     const response = await fetch(this.googleScriptUrl, {
                         method: 'POST',
                         mode: 'cors',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
                         body: JSON.stringify(dataToSend)
-                        // Removemos headers para evitar preflight
                     });
             
                     this.log(`Resposta do Google Sheets - Status: ${response.status} para ID ${recordData.id}`);
@@ -1988,7 +1990,6 @@
                     // Se for erro de CORS, salvar apenas localmente e notificar
                     if (error.message.includes('CORS') || error.message.includes('Failed to fetch')) {
                         this.log(`Erro de CORS detectado. Dados salvos apenas localmente para ${recordData.id}`, 'warn');
-                        // Não re-lançar o erro, permitir que continue com salvamento local
                         return {
                             success: true,
                             localOnly: true,
@@ -1997,10 +1998,10 @@
                         };
                     }
                     
-                    throw error; // Re-lançar outros tipos de erro
+                    throw error;
                 }
             }
-                        loadRecords() {
+                                    loadRecords() {
                 try {
                     this.records = JSON.parse(localStorage.getItem('maintenanceRecords') || '[]');
                     this.filteredRecords = [...this.records]; // Começa com todos os registros
