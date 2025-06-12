@@ -1934,21 +1934,20 @@
                 }
             }
 
-            // SUBSTITUA a função saveToGoogleSheets() no seu index.html
-            // Esta versão FINAL evita completamente o preflight CORS:
-            
+            // AQUI COMEÇA A ATUALIZAÇÃO
+            // SUBSTITUÍDA a função saveToGoogleSheets()
             async saveToGoogleSheets(recordData) {
                 if (!this.googleScriptUrl) {
                     this.log('URL do Google Apps Script não configurada. Impossível salvar no Sheets.', 'error');
                     throw new Error('URL do Google Apps Script não configurada');
                 }
-            
+
                 const dataToSend = {
                     ...recordData,
                     fotos: recordData.status === 'Aberto' ? this.photos.map(photo => photo.data) : [],
                     fotosFinalizacaoData: recordData.status === 'Concluído' ? this.photosFinalize.map(photo => photo.data) : []
                 };
-            
+
                 this.log(`Enviando dados para Google Sheets para ID ${recordData.id}. Flag de teste: ${!!recordData.teste}`);
                 
                 try {
@@ -1959,13 +1958,13 @@
                         body: JSON.stringify(dataToSend)
                         // SEM HEADERS para evitar preflight CORS
                     });
-            
+
                     this.log(`Resposta do Google Sheets - Status: ${response.status} para ID ${recordData.id}`);
-            
+
                     if (!response.ok) {
                         throw new Error(`Erro HTTP ${response.status}: ${response.statusText}`);
                     }
-            
+
                     const responseData = await response.json();
                     this.log(`Resposta JSON do Google Sheets para ${recordData.id}: ${JSON.stringify(responseData).substring(0,200)}...`, 'success');
                     
@@ -1977,9 +1976,9 @@
                     if (recordData.teste && !responseData.testMode) {
                         this.log(`Registro de teste enviado, mas resposta do servidor não incluiu 'testMode:true'.`, 'warn');
                     }
-            
+
                     return responseData;
-            
+
                 } catch (error) {
                     this.log(`POST falhou, tentando método JSONP... Erro: ${error.message}`, 'warn');
                     
@@ -2002,8 +2001,8 @@
                     };
                 }
             }
-            
-            // ADICIONE esta nova função também (cole logo após saveToGoogleSheets):
+
+            // ADICIONADA a nova função saveToGoogleSheetsJSONP()
             saveToGoogleSheetsJSONP(dataToSend) {
                 return new Promise((resolve, reject) => {
                     const callbackName = 'jsonp_save_' + Date.now();
@@ -2046,6 +2045,7 @@
                     document.head.appendChild(script);
                 });
             }
+            // AQUI TERMINA A ATUALIZAÇÃO
 
             searchRecords() {
                 const searchId = (document.getElementById(this.domIds.searchId)?.value || '').toUpperCase();
