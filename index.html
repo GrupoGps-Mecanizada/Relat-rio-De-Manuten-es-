@@ -890,7 +890,7 @@
                         <p><strong>Registros Locais:</strong> <span id="localRecordsCount">0</span></p>
                         <p><strong>Fotos Armazenadas:</strong> <span id="localPhotosCount">0</span></p>
                         <p><strong>Espaço Utilizado:</strong> <span id="storageUsed">Calculando...</span></p>
-                        <p><strong>Versão:</strong> 2.1.1</p> <!-- Atualize a versão se fizer mais mudanças -->
+                        <p><strong>Versão:</strong> 2.1.2</p>
                     </div>
                 </div>
                 <div id="configStatus"></div>
@@ -1111,13 +1111,38 @@
                 
                 setTimeout(async () => {
                     if (typeof this.testConnection === 'function') {
-                        await this.testConnection(); // Tornar a chamada await se testConnection for async
+                        await this.testConnection();
                     } else {
                         this.log("INITIALIZE_SYSTEM: this.testConnection não é uma função.", "error");
                     }
                 }, 1000);
                 
                 this.log('MaintenanceSystem.initializeSystem() concluído com sucesso');
+            }
+
+            // *** CORREÇÃO PRINCIPAL: IMPLEMENTAÇÃO DO MÉTODO loadRecords ***
+            loadRecords() {
+                this.log('Carregando registros do localStorage...');
+                try {
+                    const recordsStr = localStorage.getItem('maintenanceRecords');
+                    if (recordsStr) {
+                        this.records = JSON.parse(recordsStr);
+                        this.log(`${this.records.length} registros carregados do localStorage.`);
+                    } else {
+                        this.records = [];
+                        this.log('Nenhum registro encontrado no localStorage. Array inicializado vazio.');
+                    }
+                    
+                    this.filteredRecords = [...this.records];
+                    this.displayRecords();
+                    this.updateCounts();
+                } catch (error) {
+                    this.log(`Erro ao carregar registros do localStorage: ${error.message}`, 'error', error);
+                    this.records = [];
+                    this.filteredRecords = [];
+                    this.displayRecords();
+                    this.showStatus(this.domIds.recordsList, 'Erro ao carregar registros locais.', 'error');
+                }
             }
             
             setupEventListeners() {
@@ -1168,9 +1193,6 @@
                 this.log('Event listeners configurados.');
             }
 
-            // SUBSTITUA a função testConnection() no seu index.html
-            // Encontre a função testConnection() e substitua por esta versão:
-            
             async testConnection() {
                 const button = document.querySelector(`button[onclick="window.maintenanceSystem && window.maintenanceSystem.testConnection()"]`);
                 const originalText = button ? button.textContent : 'Testar Conexão';
@@ -1199,13 +1221,11 @@
                 
                 this.log('Testando conexão com Google Apps Script...');
                 try {
-                    // Método 1: Tentar fetch simples (sem headers customizados)
                     const testUrl = `${this.googleScriptUrl}?action=config&t=${Date.now()}`;
                     
                     const response = await fetch(testUrl, {
                         method: 'GET',
                         mode: 'cors'
-                        // Removemos headers customizados para evitar preflight
                     });
                     
                     this.log(`Resposta do teste de conexão - Status: ${response.status}`);
@@ -1233,7 +1253,6 @@
                 } catch (error) {
                     this.log('Método fetch falhou, tentando JSONP...', 'warn');
                     
-                    // Método 2: Fallback usando JSONP (contorna CORS completamente)
                     try {
                         const jsonpResult = await this.testConnectionJSONP();
                         if (jsonpResult) {
@@ -1251,7 +1270,6 @@
                         this.log('JSONP também falhou: ' + jsonpError.message, 'error', jsonpError);
                     }
                     
-                    // Se tudo falhou
                     this.log('Falha na conexão: ' + error.message, 'error', error);
                     this.lastConnectionError = error.message;
                     this.connectionTested = false;
@@ -1275,7 +1293,6 @@
                 }
             }
             
-            // ADICIONE esta nova função também (cola depois da função testConnection):
             testConnectionJSONP() {
                 return new Promise((resolve, reject) => {
                     const callbackName = 'jsonp_callback_' + Date.now();
@@ -1329,10 +1346,10 @@
                 if (this.googleScriptUrl) {
                     try {
                         this.log('[DIAG] Testando conectividade básica...');
-                        const pingUrl = `${this.googleScriptUrl}?test=ping&t=${Date.now()}`; // Adicionado timestamp para evitar cache
+                        const pingUrl = `${this.googleScriptUrl}?test=ping&t=${Date.now()}`;
                         const response = await fetch(pingUrl, { method: 'GET', mode: 'cors' });
                         if (response.ok) {
-                            const data = await response.json(); // Espera JSON do Apps Script
+                            const data = await response.json();
                             if (data.success) {
                                 addDiag('Conectividade Apps Script (Ping)', 'OK', `Resposta: ${data.message}`, 'success');
                             } else {
@@ -1361,7 +1378,7 @@
                     addDiag('Espaço localStorage Usado', sizeInMB + ' MB', `Total de ${Object.keys(localStorage).length} chaves`, parseFloat(sizeInMB) > 4 ? 'warn' : 'success');
                 } catch (error) { addDiag('Espaço localStorage', 'ERRO', error.message, 'error'); }
                 
-                if (this.googleScriptUrl && this.connectionTested) { // Só testa envio se conexão parece OK
+                if (this.googleScriptUrl && this.connectionTested) {
                     try {
                         this.log('[DIAG] Testando envio de dados...');
                         const testData = {
@@ -1369,13 +1386,12 @@
                             tipoEquipamento: 'Alta Pressão', dataRegistro: new Date().toISOString().split('T')[0],
                             problema: 'Teste de envio de dados do diagnóstico', horaProblema: '00:00', horaComunicacao: '00:01',
                             status: 'Aberto', fotos: [], fotosFinalizacaoData: [], timestamp: new Date().toISOString(),
-                            teste: true // Flag especial para o backend não salvar de verdade
+                            teste: true
                         };
-                        // Simular this.photos e this.photosFinalize para saveToGoogleSheets
                         const originalPhotos = this.photos; this.photos = [];
                         const originalPhotosFinalize = this.photosFinalize; this.photosFinalize = [];
 
-                        const response = await this.saveToGoogleSheets(testData); // saveToGoogleSheets deve lidar com a flag 'teste'
+                        const response = await this.saveToGoogleSheets(testData);
 
                         this.photos = originalPhotos; this.photosFinalize = originalPhotosFinalize;
 
@@ -1398,7 +1414,7 @@
                 diagnostics.forEach(diag => {
                     const className = diag.type === 'success' ? 'debug-success' : 
                                     diag.type === 'error' ? 'debug-error' : 
-                                    diag.type === 'warn' ? 'debug-info' : 'debug-info'; // Usar debug-info para warn também
+                                    diag.type === 'warn' ? 'debug-info' : 'debug-info';
                     html += `<div class="${className}"><strong>${diag.test}:</strong> ${diag.result}<br><small>${diag.details}</small></div>`;
                 });
                 resultsDiv.innerHTML = html;
@@ -1426,7 +1442,7 @@
                         systemStatusElement.style.color = '#28a745';
                     } else {
                         systemStatusElement.textContent = 'Sistema Offline - Modo Local';
-                        systemStatusElement.style.color = this.googleScriptUrl ? '#ffc107' : '#dc3545'; // Amarelo se URL existe mas offline, Vermelho se nem URL
+                        systemStatusElement.style.color = this.googleScriptUrl ? '#ffc107' : '#dc3545';
                     }
                 } else { this.log("Elemento 'systemStatus' não encontrado para atualizar.", "warn"); }
                 
@@ -1476,7 +1492,7 @@
                 } else { this.log("Elemento 'searchPlaca' não encontrado para formatação.", "warn"); }
             }
 
-            updateSystemStatus() { // Esta função pode ser combinada com updateCounts ou se tornar mais específica
+            updateSystemStatus() {
                 this.updateCounts();
                 this.log('Status geral do sistema atualizado (contagens).');
             }
@@ -1492,7 +1508,7 @@
                 if (photoCountEl) photoCountEl.textContent = photoKeys.length;
             }
 
-            updateSystemStats() { // Chamado na aba de Configurações
+            updateSystemStats() {
                 const records = JSON.parse(localStorage.getItem('maintenanceRecords') || '[]');
                 const photoKeys = Object.keys(localStorage).filter(key => key.startsWith('photos_'));
                 
@@ -1538,8 +1554,8 @@
                     this.photosFinalize = [];
                     
                     this.updateCounts();
-                    this.updateSystemStats(); // Atualiza stats na aba config, se aberta
-                    this.loadRecords(); // Atualiza a lista de registros, que agora estará vazia
+                    this.updateSystemStats();
+                    this.loadRecords();
                     
                     this.showStatus(this.domIds.configStatus, 'Todos os dados locais foram removidos.', 'success');
                     this.log('Todos os dados locais removidos.', 'warn');
@@ -1553,7 +1569,7 @@
                         photos: {},
                         formCache: JSON.parse(localStorage.getItem('formCache') || '{}'),
                         exportDate: new Date().toISOString(),
-                        appVersion: "2.1.1" // Adicionar versão da app ao exportar
+                        appVersion: "2.1.2"
                     };
                     
                     Object.keys(localStorage).forEach(key => {
@@ -1568,7 +1584,7 @@
                     const a = document.createElement('a');
                     a.href = url;
                     a.download = `grupogps_backup_${new Date().toISOString().split('T')[0]}.json`;
-                    document.body.appendChild(a); // Necessário para Firefox
+                    document.body.appendChild(a);
                     a.click();
                     document.body.removeChild(a);
                     URL.revokeObjectURL(url);
@@ -1595,7 +1611,7 @@
                 }
                 
                 if (!confirm(`Tem certeza que deseja importar os dados do arquivo "${file.name}"? Isso PODE SOBRESCREVER dados existentes com o mesmo ID.`)) {
-                    fileInput.value = ''; // Limpar seleção
+                    fileInput.value = '';
                     return;
                 }
 
@@ -1607,14 +1623,13 @@
                         let importedPhotosSetsCount = 0;
 
                         if (importedData.records && Array.isArray(importedData.records)) {
-                            // Poderia fazer merge inteligente aqui, mas por simplicidade, vamos substituir/adicionar
                             const existingRecords = JSON.parse(localStorage.getItem('maintenanceRecords') || '[]');
                             const mergedRecords = [...existingRecords];
 
                             importedData.records.forEach(newRecord => {
                                 const index = mergedRecords.findIndex(r => r.id === newRecord.id);
-                                if (index !== -1) mergedRecords[index] = newRecord; // Substitui
-                                else mergedRecords.push(newRecord); // Adiciona
+                                if (index !== -1) mergedRecords[index] = newRecord;
+                                else mergedRecords.push(newRecord);
                             });
                             localStorage.setItem('maintenanceRecords', JSON.stringify(mergedRecords));
                             importedRecordsCount = importedData.records.length;
@@ -1622,7 +1637,7 @@
                         
                         if (importedData.photos && typeof importedData.photos === 'object') {
                             Object.keys(importedData.photos).forEach(key => {
-                                if (key.startsWith('photos_')) { // Só importar chaves de fotos
+                                if (key.startsWith('photos_')) {
                                     localStorage.setItem(key, JSON.stringify(importedData.photos[key]));
                                     importedPhotosSetsCount++;
                                 }
@@ -1633,13 +1648,13 @@
                             localStorage.setItem('formCache', JSON.stringify(importedData.formCache));
                         }
                         
-                        this.loadRecords(); // Recarrega e exibe os registros
+                        this.loadRecords();
                         this.updateCounts();
                         this.updateSystemStats();
                         
                         this.showStatus(this.domIds.configStatus, `Dados importados! ${importedRecordsCount} registros, ${importedPhotosSetsCount} conjuntos de fotos.`, 'success');
                         this.log(`Dados importados do arquivo ${file.name}.`);
-                        fileInput.value = ''; // Limpa o input de arquivo
+                        fileInput.value = '';
                     } catch (error) {
                         this.log('Erro ao importar dados: ' + error.message, 'error', error);
                         this.showStatus(this.domIds.configStatus, 'Erro ao importar dados. Verifique o formato do arquivo.', 'error');
@@ -1650,7 +1665,7 @@
 
             async startCamera(isFinalize = false) {
                 const videoEl = isFinalize ? this.videoFinalize : this.video;
-                const canvasEl = isFinalize ? this.canvasFinalize : this.canvas; // Não usado diretamente aqui, mas para contexto
+                const canvasEl = isFinalize ? this.canvasFinalize : this.canvas;
                 const startBtnId = isFinalize ? 'startCameraFinalize' : 'startCamera';
                 const captureBtnId = isFinalize ? 'capturePhotoFinalize' : 'capturePhoto';
                 const stopBtnId = isFinalize ? 'stopCameraFinalize' : 'stopCamera';
@@ -1672,14 +1687,14 @@
                     
                     if (isFinalize) {
                         this.streamFinalize = stream;
-                        videoEl.style.display = 'block'; // Mostrar vídeo de finalização
+                        videoEl.style.display = 'block';
                     } else {
                         this.stream = stream;
                     }
                     
                     videoEl.srcObject = stream;
                     
-                    videoEl.onloadedmetadata = () => { // Usar uma função de seta para manter o `this`
+                    videoEl.onloadedmetadata = () => {
                         const targetCanvas = isFinalize ? this.canvasFinalize : this.canvas;
                         if (targetCanvas) {
                             targetCanvas.width = videoEl.videoWidth;
@@ -1698,7 +1713,6 @@
                 } catch (error) {
                     this.log(`Erro ao acessar câmera ${isFinalize ? 'de finalização' : 'inicial'}: ${error.message}`, 'error', error);
                     this.showStatus(this.domIds.formStatus, 'Erro ao acessar câmera. Verifique as permissões.', 'error');
-                    // Resetar botões em caso de erro
                     startBtn.disabled = false;
                     captureBtn.disabled = true;
                     stopBtn.disabled = true;
@@ -1722,12 +1736,11 @@
                     this.showStatus(this.domIds.formStatus, 'Câmera não está pronta ou foi desligada. Tente abrir novamente.', 'error');
                     return;
                 }
-                // Garantir que as dimensões do canvas correspondem ao vídeo no momento da captura
                 canvasEl.width = videoEl.videoWidth;
                 canvasEl.height = videoEl.videoHeight;
 
                 ctx.drawImage(videoEl, 0, 0, canvasEl.width, canvasEl.height);
-                const imageData = canvasEl.toDataURL('image/jpeg', 0.85); // Qualidade 0.85
+                const imageData = canvasEl.toDataURL('image/jpeg', 0.85);
                 
                 const photoId = Date.now();
                 const newPhoto = { id: photoId, data: imageData, timestamp: new Date().toLocaleString('pt-BR') };
@@ -1755,7 +1768,6 @@
                      this.log(`Elementos de controle da câmera (${isFinalize ? 'Finalize' : 'Inicial'}) não encontrados para stopCamera.`, "warn");
                 }
 
-
                 if (streamToStop) {
                     streamToStop.getTracks().forEach(track => track.stop());
                     this.log(`Stream da câmera ${isFinalize ? 'de finalização' : 'inicial'} parado.`);
@@ -1764,7 +1776,7 @@
                 
                 if (isFinalize) {
                     this.streamFinalize = null;
-                    if (videoEl) videoEl.style.display = 'none'; // Esconder vídeo de finalização
+                    if (videoEl) videoEl.style.display = 'none';
                 } else {
                     this.stream = null;
                 }
@@ -1798,15 +1810,14 @@
 
             removePhoto(photoId) {
                 this.photos = this.photos.filter(photo => photo.id !== photoId);
-                this.updatePhotosPreview(false); // false para fotos iniciais
+                this.updatePhotosPreview(false);
                 this.showStatus(this.domIds.formStatus, 'Foto inicial removida!', 'info');
                 this.log(`Foto inicial ID ${photoId} removida.`);
             }
 
             removePhotoFinalize(photoId) {
                 this.photosFinalize = this.photosFinalize.filter(photo => photo.id !== photoId);
-                this.updatePhotosPreview(true); // true para fotos de finalização
-                // Não precisa de showStatus aqui, pois é dentro de um modal
+                this.updatePhotosPreview(true);
                 this.log(`Foto de finalização ID ${photoId} removida.`);
             }
 
@@ -1836,9 +1847,8 @@
                 const year = now.getFullYear().toString().slice(-2);
                 const month = (now.getMonth() + 1).toString().padStart(2, '0');
                 const day = now.getDate().toString().padStart(2, '0');
-                // Usar milissegundos para maior unicidade em rajadas de criação
                 const millis = now.getMilliseconds().toString().padStart(3,'0');
-                const time = now.toTimeString().slice(0,8).replace(/:/g,''); // HHMMSS
+                const time = now.toTimeString().slice(0,8).replace(/:/g,'');
                 return `GPS${year}${month}${day}${time}${millis}`;
             }
 
@@ -1863,12 +1873,12 @@
                     problema: formData.get('problema') || '',
                     horaProblema: formData.get('horaProblema') || '',
                     horaComunicacao: formData.get('horaComunicacao') || '',
-                    dataHoraLiberacao: '', // Estes são preenchidos na finalização
+                    dataHoraLiberacao: '',
                     descricao: '',
                     aprovacao: '',
-                    status: 'Aberto', // Status inicial
-                    fotos: this.photos.length, // Contagem de fotos iniciais
-                    fotosFinalizacao: 0, // Contagem de fotos de finalização (inicialmente 0)
+                    status: 'Aberto',
+                    fotos: this.photos.length,
+                    fotosFinalizacao: 0,
                     tempoManutencao: '',
                     timestamp: new Date().toISOString()
                 };
@@ -1876,12 +1886,11 @@
                 this.log(`Novo registro preparado com ID: ${recordId}. Dados: ${JSON.stringify(record).substring(0,150)}...`);
 
                 try {
-                    this.saveToLocalStorage(record); // Salva dados e fotos (this.photos)
+                    this.saveToLocalStorage(record);
                     this.updateCounts();
                     
                     if (this.googleScriptUrl && this.connectionTested) {
                         this.log(`Tentando salvar registro ${recordId} no Google Sheets...`);
-                        // this.photos e this.photosFinalize (que estará vazio aqui) são usados por saveToGoogleSheets
                         await this.saveToGoogleSheets(record); 
                         this.showStatus(this.domIds.formStatus, `Registro ${recordId} salvo localmente e sincronizado com Google Sheets!`, 'success');
                     } else if (this.googleScriptUrl && !this.connectionTested) {
@@ -1892,7 +1901,7 @@
                         this.log(`Registro ${recordId} salvo localmente. URL do Google Sheets não configurada.`, 'info');
                     }
                     
-                    setTimeout(() => { this.resetForm(); }, 2000); // Resetar após feedback
+                    setTimeout(() => { this.resetForm(); }, 2000);
                     
                 } catch (error) {
                     this.log('Erro ao salvar registro (submitForm): ' + error.message, 'error', error);
@@ -1906,23 +1915,19 @@
                     const existingIndex = existingRecords.findIndex(r => r.id === record.id);
                     
                     if (existingIndex !== -1) {
-                        existingRecords[existingIndex] = record; // Atualiza
+                        existingRecords[existingIndex] = record;
                         this.log(`Registro ${record.id} atualizado no localStorage.`);
                     } else {
-                        existingRecords.push(record); // Adiciona novo
+                        existingRecords.push(record);
                         this.log(`Novo registro ${record.id} adicionado ao localStorage.`);
                     }
                     localStorage.setItem('maintenanceRecords', JSON.stringify(existingRecords));
                     
-                    // Salvar fotos atuais (this.photos) se for um novo registro ou se houver fotos
-                    // Se for uma atualização de um registro já finalizado, não sobrescrever fotos iniciais
-                    // a menos que seja intencional. Aqui, this.photos refere-se às fotos do formulário 'novo'.
-                    if (this.photos.length > 0 && record.status === 'Aberto') { // Só salva fotos se o registro estiver sendo criado (Aberto)
+                    if (this.photos.length > 0 && record.status === 'Aberto') {
                          localStorage.setItem(`photos_${record.id}`, JSON.stringify(this.photos));
                          this.log(`${this.photos.length} fotos iniciais para ${record.id} salvas no localStorage.`);
                     }
 
-                    // Se for uma finalização, this.photosFinalize terá dados e deve ser salvo
                     if (this.photosFinalize && this.photosFinalize.length > 0 && record.status === 'Concluído') {
                         localStorage.setItem(`photos_finalize_${record.id}`, JSON.stringify(this.photosFinalize));
                         this.log(`${this.photosFinalize.length} fotos de finalização para ${record.id} salvas no localStorage.`);
@@ -1930,12 +1935,9 @@
 
                 } catch (error) {
                     this.log(`Erro ao salvar ${record.id} no localStorage: ${error.message}`, 'error', error);
-                    // Considerar um status de erro na UI aqui também.
                 }
             }
 
-            // AQUI COMEÇA A ATUALIZAÇÃO
-            // SUBSTITUÍDA a função saveToGoogleSheets()
             async saveToGoogleSheets(recordData) {
                 if (!this.googleScriptUrl) {
                     this.log('URL do Google Apps Script não configurada. Impossível salvar no Sheets.', 'error');
@@ -1951,12 +1953,10 @@
                 this.log(`Enviando dados para Google Sheets para ID ${recordData.id}. Flag de teste: ${!!recordData.teste}`);
                 
                 try {
-                    // MÉTODO 1: Tentar POST simples (sem Content-Type para evitar preflight)
                     const response = await fetch(this.googleScriptUrl, {
                         method: 'POST',
                         mode: 'cors',
                         body: JSON.stringify(dataToSend)
-                        // SEM HEADERS para evitar preflight CORS
                     });
 
                     this.log(`Resposta do Google Sheets - Status: ${response.status} para ID ${recordData.id}`);
@@ -1982,7 +1982,6 @@
                 } catch (error) {
                     this.log(`POST falhou, tentando método JSONP... Erro: ${error.message}`, 'warn');
                     
-                    // MÉTODO 2: Fallback usando JSONP para contornar CORS completamente
                     try {
                         const jsonpResult = await this.saveToGoogleSheetsJSONP(dataToSend);
                         this.log(`Dados salvos via JSONP para ${recordData.id}`, 'success');
@@ -1991,7 +1990,6 @@
                         this.log(`JSONP também falhou para ${recordData.id}: ${jsonpError.message}`, 'error');
                     }
                     
-                    // MÉTODO 3: Se tudo falhar, salvar apenas localmente
                     this.log(`Erro de conectividade. Dados salvos apenas localmente para ${recordData.id}`, 'warn');
                     return {
                         success: true,
@@ -2002,7 +2000,6 @@
                 }
             }
 
-            // ADICIONADA a nova função saveToGoogleSheetsJSONP()
             saveToGoogleSheetsJSONP(dataToSend) {
                 return new Promise((resolve, reject) => {
                     const callbackName = 'jsonp_save_' + Date.now();
@@ -2010,7 +2007,7 @@
                     const timeoutId = setTimeout(() => {
                         cleanup();
                         reject(new Error('JSONP timeout para salvamento'));
-                    }, 30000); // 30 segundos timeout
+                    }, 30000);
                     
                     const cleanup = () => {
                         if (script.parentNode) {
@@ -2035,7 +2032,6 @@
                         reject(new Error('Erro ao carregar script JSONP para salvamento'));
                     };
                     
-                    // Codificar dados como parâmetros URL para JSONP
                     const params = new URLSearchParams();
                     params.append('callback', callbackName);
                     params.append('data', JSON.stringify(dataToSend));
@@ -2045,7 +2041,6 @@
                     document.head.appendChild(script);
                 });
             }
-            // AQUI TERMINA A ATUALIZAÇÃO
 
             searchRecords() {
                 const searchId = (document.getElementById(this.domIds.searchId)?.value || '').toUpperCase();
@@ -2099,7 +2094,6 @@
                     return;
                 }
 
-                // Ordenar por timestamp (mais recente primeiro)
                 const sortedRecords = [...this.filteredRecords].sort((a, b) => {
                     const dateA = new Date(a.timestamp || 0);
                     const dateB = new Date(b.timestamp || 0);
@@ -2108,8 +2102,8 @@
                 
                 container.innerHTML = sortedRecords.map(record => {
                     const recordText = this.generateFormattedRecordText(record);
-                    const statusClass = this.getStatusClass(record); // pending, completed, approved, rejected
-                    const statusText = this.getStatusText(record);   // Em Aberto, Concluído, Aprovada, Reprovada
+                    const statusClass = this.getStatusClass(record);
+                    const statusText = this.getStatusText(record);
                     
                     return `
                         <div class="record-item ${statusClass}">
@@ -2138,14 +2132,12 @@
 
             generateFormattedRecordText(record) {
                 const status = this.getStatusText(record);
-                // Formatar dataRegistro para dd/mm/yyyy
                 let dataFormatada = 'Não informado';
                 if (record.dataRegistro) {
-                    const parts = record.dataRegistro.split('-'); // YYYY-MM-DD
+                    const parts = record.dataRegistro.split('-');
                     if (parts.length === 3) {
                         dataFormatada = `${parts[2]}/${parts[1]}/${parts[0]}`;
                     } else {
-                        // Tentar formatar se for um objeto Date ou timestamp ISO
                         try { dataFormatada = new Date(record.dataRegistro).toLocaleDateString('pt-BR'); }
                         catch(e) { /* manter 'Não informado' */ }
                     }
@@ -2200,14 +2192,14 @@ Texto gerado em: ${agora}
                 return texto;
             }
 
-            getStatusClass(record) { // Retorna classe CSS para o item
+            getStatusClass(record) {
                 if (record.aprovacao === 'Aprovada') return 'approved';
                 if (record.aprovacao === 'Reprovada') return 'rejected';
                 if (record.status === 'Concluído') return 'completed';
-                return 'pending'; // Default para 'Aberto'
+                return 'pending';
             }
 
-            getStatusText(record) { // Retorna texto amigável do status
+            getStatusText(record) {
                 if (record.aprovacao === 'Aprovada') return 'Manutenção Aprovada';
                 if (record.aprovacao === 'Reprovada') return 'Manutenção Reprovada';
                 if (record.status === 'Concluído') return 'Manutenção Concluída';
@@ -2223,11 +2215,10 @@ Texto gerado em: ${agora}
                         this.log(`Texto do registro ${recordId} copiado para área de transferência.`);
                     }).catch(err => {
                         this.log(`Falha ao copiar texto para ${recordId}: ${err.message}`, 'error', err);
-                        // Fallback para navegadores mais antigos (menos comum hoje em dia)
                         try {
                             const textArea = document.createElement('textarea');
                             textArea.value = textToCopy;
-                            textArea.style.position = 'fixed'; textArea.style.opacity = '0'; // Esconder
+                            textArea.style.position = 'fixed'; textArea.style.opacity = '0';
                             document.body.appendChild(textArea);
                             textArea.select();
                             document.execCommand('copy');
@@ -2265,35 +2256,32 @@ Texto gerado em: ${agora}
 
                 const finalizeModalEl = document.getElementById(this.domIds.finalizeModal);
                 const finalizeContentEl = document.getElementById(this.domIds.finalizeContent);
-                const originalPhotosEl = document.getElementById(this.domIds.originalPhotos); // Este ID precisa existir no HTML do modal se quiser mostrar fotos originais
+                const originalPhotosEl = document.getElementById(this.domIds.originalPhotos);
 
                 if (!finalizeModalEl || !finalizeContentEl) {
                     this.log("Elementos do modal de finalização não encontrados.", "error");
                     return;
                 }
 
-                // Carregar fotos de finalização existentes do localStorage
                 const existingFinalizePhotosStr = localStorage.getItem(`photos_finalize_${recordId}`);
                 if (existingFinalizePhotosStr) {
                     try { this.photosFinalize = JSON.parse(existingFinalizePhotosStr); }
                     catch (e) { this.photosFinalize = []; this.log(`Erro ao parsear fotos de finalização para ${recordId}: ${e.message}`, "warn");}
                 } else {
-                    this.photosFinalize = []; // Começa vazio se não houver
+                    this.photosFinalize = [];
                 }
 
-                // Popular modal com dados do registro
                 finalizeContentEl.innerHTML = `
                     <h4>Detalhes do Registro Original:</h4>
                     <div class="record-details" style="max-height: 150px; overflow-y: auto; margin-bottom: 15px;">
                         ${this.generateFormattedRecordText(this.currentRecord).replace(/\n/g, '<br>')}
                     </div>
-                    <div id="${this.domIds.originalPhotos}"></div> <!-- Placeholder para fotos originais -->
+                    <div id="${this.domIds.originalPhotos}"></div>
                 `;
 
-                // Carregar e exibir fotos originais (se existirem)
-                if (originalPhotosEl || document.getElementById(this.domIds.originalPhotos)) { // Verificar se o placeholder existe
+                if (originalPhotosEl || document.getElementById(this.domIds.originalPhotos)) {
                     const originalPhotosStr = localStorage.getItem(`photos_${recordId}`);
-                    const targetOriginalPhotosDiv = document.getElementById(this.domIds.originalPhotos); // Pega o div recém-criado
+                    const targetOriginalPhotosDiv = document.getElementById(this.domIds.originalPhotos);
                     if (targetOriginalPhotosDiv && originalPhotosStr) {
                         try {
                             const photos = JSON.parse(originalPhotosStr);
@@ -2317,14 +2305,12 @@ Texto gerado em: ${agora}
                     }
                 }
 
-                // Popular campos do formulário de finalização com dados existentes
                 const dataHoraLibEl = document.getElementById(this.domIds.dataHoraLiberacao);
                 const aprovacaoEl = document.getElementById(this.domIds.aprovacao);
                 const descricaoFinalizacaoEl = document.getElementById(this.domIds.descricaoFinalizacao);
 
                 if (dataHoraLibEl && this.currentRecord.dataHoraLiberacao) {
                     try {
-                        // Formatar para datetime-local (YYYY-MM-DDTHH:mm)
                         const date = new Date(this.currentRecord.dataHoraLiberacao);
                         const year = date.getFullYear();
                         const month = (date.getMonth() + 1).toString().padStart(2, '0');
@@ -2334,15 +2320,15 @@ Texto gerado em: ${agora}
                         dataHoraLibEl.value = `${year}-${month}-${day}T${hours}:${minutes}`;
                     } catch (e) { 
                         this.log(`Erro ao formatar dataHoraLiberacao para ${recordId}: ${e.message}`, "warn");
-                        dataHoraLibEl.value = ''; // Limpar se houver erro
+                        dataHoraLibEl.value = '';
                     }
-                } else if (dataHoraLibEl) { dataHoraLibEl.value = ''; } // Limpar se não houver valor
+                } else if (dataHoraLibEl) { dataHoraLibEl.value = ''; }
 
                 if (aprovacaoEl) aprovacaoEl.value = this.currentRecord.aprovacao || '';
                 if (descricaoFinalizacaoEl) descricaoFinalizacaoEl.value = this.currentRecord.descricao || '';
 
-                this.updatePhotosPreview(true); // Atualiza preview das fotos de finalização
-                this.calculateMaintenanceTime(); // Calcula e exibe o tempo com base nos dados
+                this.updatePhotosPreview(true);
+                this.calculateMaintenanceTime();
                 
                 finalizeModalEl.classList.remove('hidden');
             }
@@ -2350,9 +2336,9 @@ Texto gerado em: ${agora}
             closeFinalizeModal() {
                 const finalizeModalEl = document.getElementById(this.domIds.finalizeModal);
                 if (finalizeModalEl) finalizeModalEl.classList.add('hidden');
-                this.stopCamera(true); // Para a câmera de finalização se estiver ativa
+                this.stopCamera(true);
                 this.currentRecord = null;
-                this.photosFinalize = []; // Limpa array de fotos de finalização temporárias
+                this.photosFinalize = [];
                 this.log('Modal de finalização fechado.');
             }
 
@@ -2367,10 +2353,10 @@ Texto gerado em: ${agora}
                     return;
                 }
 
-                const comunicacao = this.currentRecord.horaComunicacao; // HH:mm
-                const dataRegistro = this.currentRecord.dataRegistro;   // YYYY-MM-DD
+                const comunicacao = this.currentRecord.horaComunicacao;
+                const dataRegistro = this.currentRecord.dataRegistro;
                 const dataHoraLiberacaoEl = document.getElementById(this.domIds.dataHoraLiberacao);
-                const liberacaoStr = dataHoraLiberacaoEl ? dataHoraLiberacaoEl.value : null; // YYYY-MM-DDTHH:mm
+                const liberacaoStr = dataHoraLiberacaoEl ? dataHoraLiberacaoEl.value : null;
 
                 if (!comunicacao || !dataRegistro || !liberacaoStr) {
                     timeCalculationEl.innerHTML = '<small>Preencha Data/Hora de Liberação, Data de Registro e Hora de Comunicação para calcular.</small>';
@@ -2378,8 +2364,8 @@ Texto gerado em: ${agora}
                 }
 
                 try {
-                    const startTime = new Date(`${dataRegistro}T${comunicacao}`); // Constrói data ISO
-                    const endTime = new Date(liberacaoStr);                 // datetime-local é diretamente compatível
+                    const startTime = new Date(`${dataRegistro}T${comunicacao}`);
+                    const endTime = new Date(liberacaoStr);
 
                     if (isNaN(startTime.getTime()) || isNaN(endTime.getTime())) {
                         timeCalculationEl.innerHTML = '<small>Datas/horas inválidas para cálculo.</small>';
@@ -2401,7 +2387,7 @@ Texto gerado em: ${agora}
                         <strong>Tempo Estimado de Manutenção:</strong> ${timeText}<br>
                         <small>Início (Comunicação): ${startTime.toLocaleString('pt-BR')} | Fim (Liberação): ${endTime.toLocaleString('pt-BR')}</small>
                     `;
-                    this.currentRecord.tempoManutencao = timeText; // Atualiza no objeto currentRecord temporariamente
+                    this.currentRecord.tempoManutencao = timeText;
                 } catch (error) {
                     timeCalculationEl.innerHTML = '<small>Erro ao calcular tempo. Verifique os dados inseridos.</small>';
                     this.log('Erro ao calcular tempo de manutenção: ' + error.message, 'error', error);
@@ -2435,7 +2421,6 @@ Texto gerado em: ${agora}
                     return;
                 }
 
-                // Recalcular tempo de manutenção com os valores finais
                 let tempoManutencaoFinal = '';
                 if (dataHoraLiberacao && this.currentRecord.horaComunicacao && this.currentRecord.dataRegistro) {
                     try {
@@ -2453,29 +2438,25 @@ Texto gerado em: ${agora}
                     }
                 }
 
-                // Atualizar o objeto do registro atual
                 this.currentRecord.dataHoraLiberacao = dataHoraLiberacao;
                 this.currentRecord.aprovacao = aprovacao;
                 this.currentRecord.descricao = descricao;
-                this.currentRecord.fotosFinalizacao = this.photosFinalize.length; // Contagem das fotos de finalização
+                this.currentRecord.fotosFinalizacao = this.photosFinalize.length;
                 this.currentRecord.tempoManutencao = tempoManutencaoFinal;
                 this.currentRecord.status = 'Concluído';
-                this.currentRecord.timestamp = new Date().toISOString(); // Atualizar timestamp para refletir a modificação
+                this.currentRecord.timestamp = new Date().toISOString();
 
                 try {
-                    this.saveToLocalStorage(this.currentRecord); // Salva dados e fotos de finalização (this.photosFinalize)
+                    this.saveToLocalStorage(this.currentRecord);
                     
                     if (this.googleScriptUrl && this.connectionTested) {
                         this.log(`Tentando sincronizar finalização de ${this.currentRecord.id} com Google Sheets...`);
-                        // this.photosFinalize será usado por saveToGoogleSheets
-                        // this.photos (iniciais) não devem ser reenviadas a menos que a lógica de saveToGoogleSheets permita isso
-                        // Para garantir, vamos limpar this.photos se não for para reenviar
-                        const originalInitialPhotos = [...this.photos]; // Salvar estado
-                        this.photos = []; // Não reenviar fotos iniciais ao finalizar
+                        const originalInitialPhotos = [...this.photos];
+                        this.photos = [];
 
                         await this.saveToGoogleSheets(this.currentRecord);
 
-                        this.photos = originalInitialPhotos; // Restaurar
+                        this.photos = originalInitialPhotos;
                         this.showStatus(this.domIds.formStatus, `Finalização do registro ${this.currentRecord.id} salva e sincronizada!`, 'success');
                     } else {
                         this.showStatus(this.domIds.formStatus, `Finalização do registro ${this.currentRecord.id} salva localmente! (Sincronização pendente ou Apps Script não configurado)`, 'success');
@@ -2483,7 +2464,7 @@ Texto gerado em: ${agora}
                     }
                     
                     this.closeFinalizeModal();
-                    this.loadRecords(); // Atualiza a lista de registros
+                    this.loadRecords();
                 } catch (error) {
                     this.log(`Erro ao salvar finalização de ${this.currentRecord.id}: ${error.message}`, 'error', error);
                     alert(`Erro ao salvar finalização. Verifique o console.`);
@@ -2509,7 +2490,6 @@ Texto gerado em: ${agora}
                 else if (type === 'completed') filteredRecordsForReport = filteredRecordsForReport.filter(r => r.status === 'Concluído' && (!r.aprovacao || r.aprovacao === ''));
                 else if (type === 'approved') filteredRecordsForReport = filteredRecordsForReport.filter(r => r.aprovacao === 'Aprovada');
                 else if (type === 'rejected') filteredRecordsForReport = filteredRecordsForReport.filter(r => r.aprovacao === 'Reprovada');
-                // Adicionar filtro por tipo de equipamento se "by-equipment" for selecionado (precisaria de outro select para o tipo)
 
                 const now = new Date();
                 const todayMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -2518,7 +2498,7 @@ Texto gerado em: ${agora}
                     filteredRecordsForReport = filteredRecordsForReport.filter(r => new Date(r.dataRegistro).getTime() === todayMidnight.getTime());
                 } else if (period === 'week') {
                     const startOfWeek = new Date(todayMidnight);
-                    startOfWeek.setDate(todayMidnight.getDate() - todayMidnight.getDay()); // Domingo
+                    startOfWeek.setDate(todayMidnight.getDate() - todayMidnight.getDay());
                     filteredRecordsForReport = filteredRecordsForReport.filter(r => new Date(r.dataRegistro) >= startOfWeek);
                 } else if (period === 'month') {
                     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
@@ -2560,18 +2540,16 @@ Texto gerado em: ${agora}
                     const pageHeight = pdf.internal.pageSize.getHeight();
                     const margin = 15;
                     let currentY = margin;
-                    const lineHeight = 5; // Aproximadamente para fonte 10pt
+                    const lineHeight = 5;
 
                     const addPageIfNeeded = (spaceNeeded) => {
                         if (currentY + spaceNeeded > pageHeight - margin) {
                             pdf.addPage();
                             currentY = margin;
-                            // Adicionar cabeçalho/rodapé em nova página se necessário
                             pdf.setFontSize(8).text(`Página ${pdf.internal.getNumberOfPages()}`, pageWidth - margin, pageHeight - (margin/2), {align: 'right'});
                         }
                     };
                     
-                    // Cabeçalho Geral do Relatório
                     pdf.setFontSize(18).setFont(undefined, 'bold');
                     pdf.text('GRUPOGPS - Relatório de Manutenção', pageWidth / 2, currentY, { align: 'center' });
                     currentY += 10;
@@ -2582,7 +2560,7 @@ Texto gerado em: ${agora}
                     currentY += 10;
 
                     for (const record of recordsToReport) {
-                        addPageIfNeeded(80); // Estimar espaço para um registro
+                        addPageIfNeeded(80);
                         
                         const recordText = this.generateFormattedRecordText(record);
                         const lines = pdf.splitTextToSize(recordText, pageWidth - (2 * margin));
@@ -2600,15 +2578,13 @@ Texto gerado em: ${agora}
                             currentY += lineHeight;
                         });
                         
-                        // Adicionar fotos (simplificado, pode precisar de mais lógica de paginação)
                         currentY = await this.addPhotosToReport(pdf, record, currentY, margin, pageWidth, pageHeight, addPageIfNeeded, lineHeight);
                         
-                        currentY += lineHeight * 2; // Espaço entre registros
-                        pdf.setLineWidth(0.2).line(margin, currentY, pageWidth - margin, currentY); // Separador
+                        currentY += lineHeight * 2;
+                        pdf.setLineWidth(0.2).line(margin, currentY, pageWidth - margin, currentY);
                         currentY += lineHeight * 2;
                     }
                     
-                    // Rodapé final (última página)
                     pdf.setFontSize(8).text(`Página ${pdf.internal.getNumberOfPages()}`, pageWidth - margin, pageHeight - (margin/2), {align: 'right'});
 
                     const fileName = `GrupoGPS_Relatorio_${reportTitleSuffix}_${new Date().toISOString().split('T')[0]}.pdf`;
@@ -2625,8 +2601,8 @@ Texto gerado em: ${agora}
 
             async addPhotosToReport(pdf, record, startY, margin, pageWidth, pageHeight, addPageIfNeededFn, lineHeight) {
                 let currentY = startY;
-                const photoMaxHeight = 50; // mm
-                const photoMaxWidth = (pageWidth - (2 * margin)) / 2 - 5; // Duas fotos por linha com espaço
+                const photoMaxHeight = 50;
+                const photoMaxWidth = (pageWidth - (2 * margin)) / 2 - 5;
 
                 const processPhotos = async (photosDataStr, typeLabel) => {
                     if (photosDataStr) {
@@ -2640,9 +2616,8 @@ Texto gerado em: ${agora}
                                 
                                 let currentX = margin;
                                 for (let i = 0; i < photos.length; i++) {
-                                    addPageIfNeededFn(photoMaxHeight + lineHeight); // Espaço para uma foto e legenda
+                                    addPageIfNeededFn(photoMaxHeight + lineHeight);
                                     try {
-                                        // Tentar adicionar imagem. Se falhar, pular para a próxima.
                                         await new Promise((resolve, reject) => {
                                             const img = new Image();
                                             img.onload = () => {
@@ -2663,7 +2638,7 @@ Texto gerado em: ${agora}
                                                 this.log(`Erro ao carregar imagem para PDF (Registro ${record.id}, Foto ${typeLabel} ${i+1})`, "warn");
                                                 pdf.setFontSize(7).setFont(undefined, 'italic');
                                                 pdf.text(`[Erro ao carregar foto ${i+1}]`, currentX, currentY + 10);
-                                                resolve(); // Resolve para não parar o PDF, mas registra o erro
+                                                resolve();
                                             };
                                             img.src = photos[i].data;
                                         });
@@ -2674,15 +2649,14 @@ Texto gerado em: ${agora}
                                         pdf.text(`[Erro ao processar foto ${i+1}]`, currentX, currentY + 10);
                                     }
                                     
-                                    // Mover para próxima posição de foto
-                                    if ((i + 1) % 2 === 0 || i === photos.length - 1) { // Nova linha após 2 fotos ou se for a última
+                                    if ((i + 1) % 2 === 0 || i === photos.length - 1) {
                                         currentY += photoMaxHeight + lineHeight * 2;
                                         currentX = margin;
                                     } else {
-                                        currentX += photoMaxWidth + 5; // Próxima coluna
+                                        currentX += photoMaxWidth + 5;
                                     }
                                 }
-                                currentY += lineHeight; // Espaço extra após bloco de fotos
+                                currentY += lineHeight;
                             }
                         } catch (error) {
                             this.log(`Erro ao processar string de fotos ${typeLabel} para PDF (Registro ${record.id}): ${error.message}`, 'error', error);
@@ -2701,11 +2675,10 @@ Texto gerado em: ${agora}
                 if (form) form.reset();
                 else this.log("Formulário 'maintenanceForm' não encontrado para resetar.", "warn");
 
-                this.photos = []; // Limpa array de fotos iniciais
-                this.updatePhotosPreview(false); // Atualiza preview das fotos iniciais
-                this.stopCamera(false); // Para câmera inicial se estiver ativa
+                this.photos = [];
+                this.updatePhotosPreview(false);
+                this.stopCamera(false);
                 
-                // Resetar valores padrão de data/hora
                 const now = new Date();
                 const dataRegistroEl = document.getElementById(this.domIds.dataRegistro);
                 const horaProblemaEl = document.getElementById(this.domIds.horaProblema);
@@ -2715,7 +2688,7 @@ Texto gerado em: ${agora}
                 if (horaProblemaEl) horaProblemaEl.value = now.toTimeString().slice(0,5);
                 if (horaComunicacaoEl) horaComunicacaoEl.value = now.toTimeString().slice(0,5);
                 
-                this.loadCacheData(); // Recarrega dados de cache (ex: responsável)
+                this.loadCacheData();
                 this.log('Formulário de novo registro resetado.');
                 this.showStatus(this.domIds.formStatus, 'Formulário limpo.', 'info');
             }
@@ -2723,15 +2696,14 @@ Texto gerado em: ${agora}
             showStatus(elementId, message, type) {
                 const element = document.getElementById(elementId);
                 if (element) {
-                    element.className = `status ${type}`; // Adiciona classe de tipo (success, error, info)
+                    element.className = `status ${type}`;
                     element.textContent = message;
                     
-                    // Limpar mensagem após um tempo, exceto se for erro persistente
-                    if (type !== 'error') { // Ou basear em uma flag de persistência
+                    if (type !== 'error') {
                         setTimeout(() => {
-                            if (element.textContent === message) { // Só limpar se a mensagem não mudou
+                            if (element.textContent === message) {
                                 element.textContent = '';
-                                element.className = 'status'; // Remove classe de tipo
+                                element.className = 'status';
                             }
                         }, 5000);
                     }
@@ -2739,7 +2711,7 @@ Texto gerado em: ${agora}
                     this.log(`Elemento de status '${elementId}' não encontrado para exibir mensagem: "${message}"`, "warn");
                 }
             }
-        } // Fim da classe MaintenanceSystem
+        }
         console.log('Classe MaintenanceSystem definida.');
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -2749,12 +2721,6 @@ Texto gerado em: ${agora}
                     window.maintenanceSystem = new MaintenanceSystem();
                     console.log('[DOM] MaintenanceSystem instanciado e atribuído a window.maintenanceSystem.');
                     
-                    // Se a primeira aba ativa ('novo') precisa de alguma inicialização específica
-                    // que depende do maintenanceSystem, poderia ser chamada aqui.
-                    // No entanto, 'novo' é a aba padrão e não parece precisar de setup especial
-                    // além do que o construtor/initializeSystem já faz.
-
-                    // Forçar a primeira aba a ser exibida corretamente, caso os botões sejam criados dinamicamente no futuro
                     const activeButton = document.querySelector('.nav-btn.active');
                     if (activeButton) {
                         const activeSectionId = activeButton.getAttribute('onclick').match(/showSection\('([^']+)'/);
@@ -2769,7 +2735,7 @@ Texto gerado em: ${agora}
                 }
             } catch (error) {
                 console.error('[DOM] Erro FATAL durante a inicialização do MaintenanceSystem no DOMContentLoaded:', error, error.stack);
-                const systemStatusEl = document.getElementById('systemStatus'); // Usar this.domIds.systemStatus se a classe já estiver instanciada
+                const systemStatusEl = document.getElementById('systemStatus');
                 if (systemStatusEl) {
                     systemStatusEl.textContent = 'ERRO NA INICIALIZAÇÃO DO SISTEMA!';
                     systemStatusEl.style.color = 'red';
@@ -2786,7 +2752,7 @@ Texto gerado em: ${agora}
                 return "Erro: window.maintenanceSystem não definido.";
             }
             console.log('=== INICIANDO TESTE DO SISTEMA GRUPOGPS (via console) ===');
-            const ms = window.maintenanceSystem; // Atalho
+            const ms = window.maintenanceSystem;
             console.log('1. URL Configurada:', ms.googleScriptUrl);
             console.log('2. Conexão Testada Previamente:', ms.connectionTested);
             console.log('3. Último Erro de Conexão:', ms.lastConnectionError || 'Nenhum');
@@ -2798,13 +2764,11 @@ Texto gerado em: ${agora}
                 tipoEquipamento: 'Alta Pressão', dataRegistro: new Date().toISOString().split('T')[0],
                 problema: 'Teste de salvamento e sincronização via console', horaProblema: '12:00', horaComunicacao: '12:30',
                 status: 'Aberto', fotos: 0, fotosFinalizacao: 0, timestamp: new Date().toISOString(),
-                teste: true // IMPORTANTE: Flag para o backend tratar como teste
+                teste: true
             };
             
             console.log('6. Preparando para enviar dados de teste (com flag "teste: true")...');
             
-            // saveToGoogleSheets espera que this.photos e this.photosFinalize sejam arrays
-            // Para este teste, vamos garantir que estejam vazios se a intenção é não enviar fotos reais
             const originalPhotosState = { photos: [...ms.photos], photosFinalize: [...ms.photosFinalize] };
             ms.photos = []; 
             ms.photosFinalize = [];
@@ -2813,7 +2777,7 @@ Texto gerado em: ${agora}
                 .then(result => {
                     console.log('✅ Teste de envio para Google Sheets (com flag "teste") BEM-SUCEDIDO:', result);
                     if (result.testMode) {
-                        console.log("    potwierdzenie do modo de teste recebido do servidor.");
+                        console.log("    confirmação do modo de teste recebido do servidor.");
                     } else {
                         console.warn("   AVISO: Servidor não confirmou o modo de teste na resposta.");
                     }
@@ -2822,7 +2786,6 @@ Texto gerado em: ${agora}
                     console.error('❌ Teste de envio para Google Sheets (com flag "teste") FALHOU:', error.message, error);
                 })
                 .finally(() => {
-                    // Restaurar estado original das fotos da instância, se necessário
                     ms.photos = originalPhotosState.photos;
                     ms.photosFinalize = originalPhotosState.photosFinalize;
                     console.log('--- Teste via console finalizado. ---');
@@ -2841,15 +2804,11 @@ Texto gerado em: ${agora}
                 const diagnosticsResultsEl = document.getElementById(window.maintenanceSystem.domIds.diagnosticsResults);
                 if (diagnosticsResultsEl) {
                     const errorDiv = document.createElement('div');
-                    errorDiv.className = 'debug-error'; // Usar classe de estilo existente
+                    errorDiv.className = 'debug-error';
                     errorDiv.innerHTML = `<strong>ERRO GLOBAL:</strong> ${msg}<br><small>Arquivo: ${url.substring(url.lastIndexOf('/')+1)} (Linha: ${lineNo}, Col: ${columnNo})</small>`;
                     diagnosticsResultsEl.appendChild(errorDiv);
-                } else {
-                    // Se o painel de diagnóstico não estiver visível ou não existir, pode ser útil um alert para erros muito críticos
-                    // alert(`Erro crítico na aplicação: ${msg}`);
                 }
             }
-            // Retornar true suprimiria o erro no console padrão do navegador, geralmente queremos false.
             return false; 
         };
         console.log('Bloco de script principal e handlers globais configurados.');
